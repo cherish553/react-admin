@@ -1,25 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "antd";
-export default function Home() {
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
+import { useHistory } from "react-router-dom";
 
-  // Similar to componentDidMount and componentDidUpdate:
+import style from "./index.module.scss";
+import classnames from 'classnames';
+import { Card } from "antd";
+interface HomeList {
+  title: string;
+  count: number;
+}
+export default function Home() {
+  const router = useHistory()
   useEffect(() => {
-   
+    console.log(router)
     // Update the document title using the browser API
     // document.title = `You clicked ${count} times`;
-  },[page])
-  const chifan=()=>{
-    setPage(1)
-  }
+  },[router])
+  const [homeList, setList] = useState([
+    {
+      title: "用户数",
+      count: 10000,
+    },
+    {
+      title: "昨日收益",
+      count: 20000,
+    },
+  ]);
   return (
-    <div>
-      <p>You clicked {page} times</p>
-      <Button type='default' onClick={() => setPage(page + 1)}>Click me</Button>
-      <Button type='default' onClick={() => setSize(size + 1)}>Click me</Button>
-      <Button onClick={() => chifan()}>Click me</Button>
-      {size}
+    <div className={style.cardlLyout}>
+      {homeList.map((item: HomeList) => (
+        <Card className={style.mr25} key={item.title} style={{ width: 200 }}>
+          <div className={classnames(style.textRight,style.card)}>
+            <div className={style.width50}></div>
+            <div className={style.width50}>
+              <div> {item.title}</div>
+              <div> {item.count}</div>
+            </div>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 }
