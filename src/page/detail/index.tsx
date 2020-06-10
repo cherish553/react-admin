@@ -1,11 +1,13 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 
-export default class Home extends Component {
-  render() {
-    return (
-      <div>
-        <div>回到detdiil</div>
-      </div>
-    );
-  }
+function FriendStatus() {
+  const [isOnline, setIsOnline] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsOnline(true);
+    }, 2000);
+  },[]);
+  return (<div>11111111111 {isOnline?'true':'false'}</div>);
 }
+export default FriendStatus;

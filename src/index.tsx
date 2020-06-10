@@ -4,10 +4,7 @@ import './index.scss';
 // import App from './App';
 import Router from './router';
 ReactDOM.render(
-  <React.StrictMode>
-    {/* <App /> */}
-    <Router/>
-  </React.StrictMode>,
+    <Router/> ,
   document.getElementById('root')
 );
 
