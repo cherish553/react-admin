@@ -4,6 +4,7 @@ interface RouterObj {
 export const routerObj:RouterObj = {
     '/': '首页',
     '/userList':'用户列表',
-    '/template':'模板管理'
+    '/template':'模板管理',
+    '/print':'印品管理'
 }
 

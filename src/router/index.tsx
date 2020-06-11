@@ -3,11 +3,12 @@ import { HashRouter, Route, Switch } from "react-router-dom";
 import home from "@/page/home";
 import userList from "@/page/userList";
 import template from "@/page/template";
+import print from "@/page/print";
 import Sider from "@/layout/Sider";
 import Top from "@/layout/Top";
-import { Layout, Menu } from "antd";
+import { Layout } from "antd";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 const BasicRoute = () => {
   return (
@@ -29,6 +30,7 @@ const BasicRoute = () => {
                 <Route exact path="/" component={home} />
                 <Route exact path="/userList" component={userList} />
                 <Route exact path="/template" component={template} />
+                <Route exact path="/print" component={print} />
               </Content>
             </Layout>
           </Layout>
