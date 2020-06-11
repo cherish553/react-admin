@@ -8,13 +8,14 @@ interface HomeList {
   title: string;
   count: number;
 }
-export default function Home() {
+export default function Home(aa:any) {
   const router = useHistory()
   useEffect(() => {
-    console.log(router)
+    // console.log(router)
+    // console.log(a)
     // Update the document title using the browser API
     // document.title = `You clicked ${count} times`;
-  },[router])
+  },[aa, router])
   const [homeList, setList] = useState([
     {
       title: "用户数",

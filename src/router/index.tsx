@@ -1,9 +1,10 @@
-import React,{useEffect} from "react";
+import React from "react";
 import { HashRouter, Route, Switch } from "react-router-dom";
-import Home from "@/page/home";
+import home from "@/page/home";
 import userList from "@/page/userList";
+import template from "@/page/template";
 import Sider from "@/layout/Sider";
-
+import Top from "@/layout/Top";
 import { Layout, Menu } from "antd";
 
 const { Header, Content } = Layout;
@@ -16,18 +17,7 @@ const BasicRoute = () => {
           <Layout>
             <Sider></Sider>
             <Layout>
-              <Header className="header">
-                <div className="logo" />
-                <Menu
-                  theme="dark"
-                  mode="horizontal"
-                  defaultSelectedKeys={["2"]}
-                >
-                  <Menu.Item key="1">nav 1</Menu.Item>
-                  <Menu.Item key="2">nav 2</Menu.Item>
-                  <Menu.Item key="3">nav 3</Menu.Item>
-                </Menu>
-              </Header>
+              <Top></Top>
               <Content
                 className="site-layout-background"
                 style={{
@@ -36,8 +26,9 @@ const BasicRoute = () => {
                   minHeight: 280,
                 }}
               >
-                <Route exact path="/" component={Home} />
+                <Route exact path="/" component={home} />
                 <Route exact path="/userList" component={userList} />
+                <Route exact path="/template" component={template} />
               </Content>
             </Layout>
           </Layout>

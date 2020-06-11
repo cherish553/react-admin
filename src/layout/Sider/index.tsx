@@ -7,25 +7,26 @@ const { SubMenu } = Menu;
 const { Sider } = Layout;
 const Siders = () => {
   let router = useHistory();
-  const jumpToPage=(url:string)=>{
-    router.push(url)
-  }
+  const jumpToPage = (url: string) => {
+    router.push(url);
+  };
   return (
     <Sider width={200} className="site-layout-background">
       <Menu
+        openKeys={["1"]}
+        // selectedKeys
         mode="inline"
         defaultSelectedKeys={["1"]}
         defaultOpenKeys={["sub1"]}
         style={{ height: "100%", borderRight: 0 }}
       >
-        {/*  */}
-        {/*  */}
-        <Menu.Item key="1" onClick={() => jumpToPage("/")}>首页</Menu.Item>
-        <Menu.Item key="2" onClick={() => jumpToPage("/userList")}>用户列表</Menu.Item>
-        <SubMenu key="sub1" icon={<UserOutlined />} title="模板管理">
-          <Menu.Item key="5">模板管理</Menu.Item>
-          <Menu.Item key="6">新增模板</Menu.Item>
-        </SubMenu>
+        <Menu.Item key="1" onClick={() => jumpToPage("/")}>
+          首页
+        </Menu.Item>
+        <Menu.Item key="2" onClick={() => jumpToPage("/userList")}>
+          用户列表
+        </Menu.Item>
+        <Menu.Item key="3" onClick={() => jumpToPage("/template")}>模板管理</Menu.Item>
         <SubMenu key="sub2" icon={<UserOutlined />} title="印品管理">
           <Menu.Item key="7">印品管理</Menu.Item>
           <Menu.Item key="8">类目管理</Menu.Item>
