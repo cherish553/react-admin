@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import style from "./index.module.scss";
 // import classnames from "classnames";
 import { Card, Button, Table } from "antd";
+import CategoryDialog from "./component/modal";
+import { Refs } from "./component/modal/declare";
 interface HomeList {
   title: string;
   count: number;
 }
-export default function Category() {
+export default function UserList() {
+  const Ref = useRef<Refs>();
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
   });
+  const [id, setId] = useState<string | number>("");
   const [userList, setuserList] = useState([
     {
       key: 1,
       userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      lastLoginDate: "2020-6-5",
-      a: "1",
-      b: "1",
-      c: "1",
     },
   ]);
   const [rowSelection] = useState({
@@ -38,42 +36,19 @@ export default function Category() {
   });
   const [userColumn, setuserColumn] = useState([
     {
-      title: "印品",
+      title: "类目名称",
       dataIndex: "userName",
-    },
-    {
-      title: "属于类目",
-      dataIndex: "phone",
-    },
-    {
-      title: "售价",
-      dataIndex: "dealCount",
-    },
-    {
-      title: "模板",
-      dataIndex: "a",
-    },
-    {
-      title: "添加时间",
-      dataIndex: "b",
-    },
-    {
-      title: "是否为添加印品",
-      dataIndex: "c",
     },
     {
       title: "操作",
       dataIndex: "",
       render: (_: any, e: any) => (
         <>
-          <Button size={"small"} onClick={() => changes(e)}>
+          <Button size={"small"} onClick={() => showModal(1)}>
             编辑
           </Button>
           <Button size={"small"} onClick={() => changes(e)}>
             删除
-          </Button>
-          <Button size={"small"} onClick={() => changes(e)}>
-            设置推荐
           </Button>
         </>
       ),
@@ -82,18 +57,18 @@ export default function Category() {
   const changes = (e: any): void => {
     console.log(e);
   };
+  const showModal = (id: string | number = "") => {
+    setId(id);
+    Ref.current?.SetVisible(true);
+  };
   return (
     <div>
-      <Card>
-        <div className={style.search}>
-          <Button className={style.mr20} type={"primary"}>
-            新增印品
-          </Button>
-          <Button type={"primary"}>新增类目</Button>
-        </div>
-      </Card>
-      <Button className={style.mr20} type={"primary"}>删除</Button>
-      <Button type={"primary"}>批量设置推荐</Button>
+      <Button className={style.mr20} type={"primary"}>
+        删除
+      </Button>
+      <Button type={"primary"} onClick={() => showModal()}>
+        新增类目
+      </Button>
       <div>
         <Table
           rowSelection={{
@@ -104,6 +79,7 @@ export default function Category() {
           dataSource={userList}
         ></Table>
       </div>
+      <CategoryDialog id={id} ref={Ref} />
     </div>
   );
 }
