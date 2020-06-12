@@ -1,0 +1,8 @@
+@import '@/style/index.scss';
+
+.inputWidth{
+    width: 200px;
+}
+.imageList{
+    @include flex(flex-start);
+}

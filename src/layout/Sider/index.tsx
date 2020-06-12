@@ -36,14 +36,16 @@ const Siders = () => {
           </Menu.Item>
           <Menu.Item key="8" onClick={() => jumpToPage("/category")}>类目管理</Menu.Item>
           <Menu.Item key="9">新增印品</Menu.Item>
-          <Menu.Item key="10">印品规格组合</Menu.Item>
+          <Menu.Item key="10" onClick={() => jumpToPage("/specsCompose")}>印品规格组合</Menu.Item>
         </SubMenu>
-        {/* <SubMenu key="sub3" icon={<UserOutlined />} title="订单管理">
-          <Menu.Item key="11">订单管理</Menu.Item>
+        <SubMenu key="sub3" icon={<UserOutlined />} title="订单管理">
+          <Menu.Item key="11" onClick={() => jumpToPage("/orderList")}>订单管理</Menu.Item>
           <Menu.Item key="12">评价管理</Menu.Item>
           <Menu.Item key="13">批量发货</Menu.Item>
           <Menu.Item key="14">售后管理</Menu.Item>
         </SubMenu>
+        
+        {/* 
         <SubMenu key="sub4" icon={<UserOutlined />} title="优惠券">
           <Menu.Item key="15">优惠券</Menu.Item>
           <Menu.Item key="16">添加优惠券</Menu.Item>

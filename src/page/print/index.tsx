@@ -7,14 +7,21 @@ interface HomeList {
   title: string;
   count: number;
 }
+interface Obj {
+  pathname: string;
+  search?: string;
+}
 export default function Category() {
   const router = useHistory();
   const jumpToPage = (url: string, id?: number) => {
-    console.log(id)
-    router.push({
-      pathname:url,
-      search:'?id=4'
-    });
+    console.log(id);
+    let obj:Obj = {
+      pathname: url,
+    };
+    if (id) {
+      obj = { ...obj, search: "?id=4" };
+    }
+    router.push(obj);
   };
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
