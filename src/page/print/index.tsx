@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 // import classnames from "classnames";
+import { useHistory } from "react-router-dom";
 import { Card, Button, Table } from "antd";
 interface HomeList {
   title: string;
   count: number;
 }
 export default function Category() {
+  const router = useHistory();
+  const jumpToPage = (url: string, id?: number) => {
+    console.log(id)
+    router.push({
+      pathname:url,
+      search:'?id=4'
+    });
+  };
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
@@ -66,7 +75,7 @@ export default function Category() {
       dataIndex: "",
       render: (_: any, e: any) => (
         <>
-          <Button size={"small"} onClick={() => changes(e)}>
+          <Button size={"small"} onClick={() => jumpToPage("/editPrint", 4)}>
             编辑
           </Button>
           <Button size={"small"} onClick={() => changes(e)}>
@@ -86,13 +95,19 @@ export default function Category() {
     <div>
       <Card>
         <div className={style.search}>
-          <Button className={style.mr20} type={"primary"}>
+          <Button
+            onClick={() => jumpToPage("/editPrint")}
+            className={style.mr20}
+            type={"primary"}
+          >
             新增印品
           </Button>
           <Button type={"primary"}>新增类目</Button>
         </div>
       </Card>
-      <Button className={style.mr20} type={"primary"}>删除</Button>
+      <Button className={style.mr20} type={"primary"}>
+        删除
+      </Button>
       <Button type={"primary"}>批量设置推荐</Button>
       <div>
         <Table

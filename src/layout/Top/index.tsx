@@ -7,7 +7,10 @@ function Top(props: any) {
   const [title, setTitle] = useState("");
   useEffect(() => {
     const pathname = props.location.pathname;
-    setTitle(routerObj[pathname]);
+    const search = props.location.search?'Search':'';
+    
+    console.log(props.location)
+    setTitle(routerObj[`${pathname}${search}`]);
   }, [props, props.location.pathname]);
   return (
     <Header className="header">

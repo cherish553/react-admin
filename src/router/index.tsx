@@ -5,6 +5,7 @@ import userList from "@/page/userList";
 import template from "@/page/template";
 import print from "@/page/print";
 import category from "@/page/print/category";
+import editPrint from "@/page/print/editPrint";
 
 import Sider from "@/layout/Sider";
 import Top from "@/layout/Top";
@@ -34,6 +35,7 @@ const BasicRoute = () => {
                 <Route exact path="/template" component={template} />
                 <Route exact path="/print" component={print} />
                 <Route exact path="/category" component={category} />
+                <Route exact path="/editPrint" component={editPrint} />
               </Content>
             </Layout>
           </Layout>

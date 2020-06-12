@@ -7,5 +7,7 @@ export const routerObj: RouterObj = {
     '/template': '模板管理',
     '/print': '印品管理',
     '/category': '类目管理',
+    '/editPrint':'新增印品',
+    '/editPrintSearch':'编辑印品',
 }
 

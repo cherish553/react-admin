@@ -34,7 +34,7 @@ const Siders = () => {
           <Menu.Item key="7" onClick={() => jumpToPage("/print")}>
             印品管理
           </Menu.Item>
-          <Menu.Item key="8">类目管理</Menu.Item>
+          <Menu.Item key="8" onClick={() => jumpToPage("/category")}>类目管理</Menu.Item>
           <Menu.Item key="9">新增印品</Menu.Item>
           <Menu.Item key="10">印品规格组合</Menu.Item>
         </SubMenu>
