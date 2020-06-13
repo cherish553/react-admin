@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
+import { useHistory } from "react-router-dom";
 import classnames from "classnames";
 import { Card, Input, Button, Table, Select, DatePicker } from "antd";
 import locale from "antd/es/date-picker/locale/zh_CN";
-import moment from "moment";
 import "moment/locale/zh-cn";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -11,16 +11,8 @@ interface HomeList {
   title: string;
   count: number;
 }
-export default function UserList() {
-  const status = [
-    "待付款",
-    "待发货",
-    "待打印",
-    "待收货",
-    "待评价",
-    "纠纷中",
-    "交易成功",
-  ];
+export default function CommentList() {
+  let router = useHistory();
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
@@ -46,10 +38,6 @@ export default function UserList() {
       dataIndex: "phone",
     },
     {
-      title: "收货人信息",
-      dataIndex: "dealCount",
-    },
-    {
       title: "交易金额",
       dataIndex: "lastLoginDate",
     },
@@ -58,23 +46,24 @@ export default function UserList() {
       dataIndex: "a",
     },
     {
-      title: "订单状态",
-      dataIndex: "b",
+      title: "操作",
+      dataIndex: "",
+      render: (_: any, e: any) => (
+        <Button size={"small"} onClick={() => jumpToPage("/commentDatail", 4)}>
+          查看
+        </Button>
+      ),
     },
   ]);
+  const jumpToPage = (url: string, id: number) => {
+    router.push({
+      pathname: url,
+      search: `?id=${id}`,
+    });
+  };
   return (
     <div>
       <Card className={classnames(style.w100)}>
-        <div>
-          <Select className={style.w200}>
-            {status.map((item, index) => (
-              <Option key={index} value={item}>
-                {item}
-              </Option>
-            ))}
-          </Select>
-          <Input className={style.w200} />
-        </div>
         <div className={style.search}>
           <div>
             <p>交易时间</p>
@@ -82,12 +71,10 @@ export default function UserList() {
               locale={locale}
               placeholder={["开始时间", "结束时间"]}
             />
+            <p>交易订单号</p>
+            <Input className={style.w200} type="text" />
             <Button type={"primary"}>确定</Button>
             <Button type={"primary"}>重置</Button>
-          </div>
-          <div>
-            <Button type={"primary"}>导出</Button>
-            <Button type={"primary"}>批量发货</Button>
           </div>
         </div>
       </Card>

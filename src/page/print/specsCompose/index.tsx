@@ -86,8 +86,8 @@ export default function SpecsCompose() {
     <div>
       <div>
         <Form>
-          {selectList.map((item) => (
-            <>
+          {selectList.map((item,index) => (
+            <div key={index}>
               <div>
                 <Button>删除</Button>
                 <Button>添加属性</Button>
@@ -102,7 +102,7 @@ export default function SpecsCompose() {
                   dataSource={userList}
                 ></Table>
               </Form.Item>
-            </>
+            </div>
           ))}
         </Form>
       </div>

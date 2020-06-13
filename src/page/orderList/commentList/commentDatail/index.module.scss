@@ -1,0 +1,8 @@
+@import '@/style/index.scss';
+.comment{
+    @include flex(flex-start,baseline);
+    .rate{
+        width: 300px;
+        @include flex;
+    }
+}

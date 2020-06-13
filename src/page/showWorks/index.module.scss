@@ -1,0 +1,20 @@
+@import '@/style/index.scss';
+
+.w100 {
+    width: 100%;
+}
+
+.search {
+    @include flex;
+    div {
+        @include flex;
+        input{
+            margin:0 10px;
+        }
+        button{
+            margin-left: 10px;
+        }
+       
+    }
+   
+}

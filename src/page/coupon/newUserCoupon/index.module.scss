@@ -1,0 +1,11 @@
+@import '@/style/index.scss';
+
+.full {
+    >div {
+        @include flex(flex-start)
+    }
+}
+
+.w200 {
+    width: 200px;
+}
