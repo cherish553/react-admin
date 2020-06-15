@@ -32,9 +32,17 @@ code {
 .ant-card-body {
   padding: 10px
 }
-.ant-layout-header{
+
+.ant-layout-header {
   background-color: white;
 }
-.ant-upload-picture-card-wrapper{
+
+.ant-upload-picture-card-wrapper {
   width: auto;
+}
+
+.border-none {
+  .ant-card-head {
+    border-bottom: none;
+  }
 }

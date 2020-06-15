@@ -74,15 +74,8 @@ const Siders = () => {
           <Menu.Item key="19" onClick={() => jumpToPage("/commission")}>分佣管理</Menu.Item>
           <Menu.Item key="20" onClick={() => jumpToPage("/withdrawalLog")}>提现申请记录</Menu.Item>
         </SubMenu>
-        {/* 
-       
-       
-        <SubMenu key="sub5" icon={<UserOutlined />} title="分佣管理">
-          <Menu.Item key="19">分佣管理</Menu.Item>
-          <Menu.Item key="20">提现申请记录</Menu.Item>
-        </SubMenu> */}
-        <Menu.Item key="21">数据统计</Menu.Item>
-        <Menu.Item key="22">系统设置</Menu.Item>
+        <Menu.Item key="21" onClick={() => jumpToPage("/dataStatistics")}>数据统计</Menu.Item>
+        <Menu.Item key="22" onClick={() => jumpToPage("/systemSetting")}>系统设置</Menu.Item>
       </Menu>
     </Sider>
   );

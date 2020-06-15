@@ -21,6 +21,10 @@ export const routerObj: RouterObj = {
     '/newUserCoupon':'新用户优惠券',
     '/showWorks':'作品管理',
     '/commission':'分佣管理',
-    '/withdrawalLog':'提现申请记录'
+    '/withdrawalLog':'提现申请记录',
+    '/dataStatistics':'数据统计',
+    '/systemSetting':'系统设置',
+    '/editBanner':'添加图片',
+    '/editBannerSearch':'编辑图片',
 }
 

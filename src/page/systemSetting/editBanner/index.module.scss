@@ -1,0 +1,9 @@
+@import '@/style/index.scss';
+
+.flex {
+    @include flex(flex-start);
+    input{
+        width: 200px;
+        margin-right: 20px;
+    }
+}

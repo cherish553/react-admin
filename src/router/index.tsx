@@ -19,6 +19,9 @@ import newUserCoupon from "@/page/coupon/newUserCoupon";
 import showWorks from "@/page/showWorks";
 import commission from "@/page/commission";
 import withdrawalLog from "@/page/commission/withdrawalLog";
+import dataStatistics from "@/page/dataStatistics";
+import systemSetting from "@/page/systemSetting";
+import editBanner from "@/page/systemSetting/editBanner";
 
 import Sider from "@/layout/Sider";
 import Top from "@/layout/Top";
@@ -66,6 +69,13 @@ const BasicRoute = () => {
                 <Route exact path="/showWorks" component={showWorks} />
                 <Route exact path="/commission" component={commission} />
                 <Route exact path="/withdrawalLog" component={withdrawalLog} />
+                <Route
+                  exact
+                  path="/dataStatistics"
+                  component={dataStatistics}
+                />
+                <Route exact path="/systemSetting" component={systemSetting} />
+                <Route exact path="/editBanner" component={editBanner} />
               </Content>
             </Layout>
           </Layout>

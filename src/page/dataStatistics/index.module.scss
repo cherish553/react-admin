@@ -1,0 +1,35 @@
+@import '@/style/index.scss';
+
+.card {
+    @include flex(space-around);
+    text-align: center;
+    padding-bottom: 20px;
+
+    .inner {
+        position: relative;
+
+        >:last-child {
+            margin-top: 40px;
+        }
+
+        .abs {
+            text-align: left;
+            left: -60px;
+            top: 20px;
+            position: absolute;
+        }
+
+        // margin-top: 10px;
+    }
+}
+
+.flex-start {
+    justify-content: flex-start;
+
+    :nth-child(n+1) {
+        margin-left: 30px;
+    }
+}
+.mt20{
+    margin-top: 20px;
+}
