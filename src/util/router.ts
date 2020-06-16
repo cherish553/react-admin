@@ -5,6 +5,8 @@ export const routerObj: RouterObj = {
     '/': '首页',
     '/userList': '用户列表',
     '/template': '模板管理',
+    '/editTemplate':'添加模板',
+    '/editTemplateSearch':'编辑模板',
     '/print': '印品管理',
     '/category': '类目管理',
     '/editPrint': '新增印品',

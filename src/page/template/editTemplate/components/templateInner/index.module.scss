@@ -1,0 +1,70 @@
+@import '@/style/index.scss';
+
+.canvas {
+    flex-shrink: 0;
+    width: 375px;
+    height: 667px;
+    background-color: white;
+    position: relative;
+}
+.flex{
+    @include flex(_,flex-start);
+}
+.abs{
+    position: absolute;
+}
+.circle{
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    position: absolute;
+    border-radius: 50%;
+}
+.right{
+    top: 50%;
+    margin-top: -5px;
+    right: 0;
+    margin-right:-5px;
+}
+.bottom{
+    left: 50%;
+    margin-left: -5px;
+    margin-bottom: -5px;
+    bottom: 0;
+}
+.left{
+    top: 50%;
+    left: 0;
+    margin-left: -5px;
+    margin-top: -5px;
+}
+.top{
+    margin-top: -5px;
+    top: 0;
+    left: 50%;
+    margin-left: -5px;
+}
+.rightTOP{
+    margin-top: -5px;
+    top: 0;
+    left: 100%;
+    margin-left: -5px;
+}
+.leftBottom{
+    left: 0;
+    margin-left: -5px;
+    margin-bottom: -5px;
+    bottom: 0;
+}
+.rightBottom{
+    left: 100%;
+    margin-left: -5px;
+    margin-bottom: -5px;
+    bottom: 0;
+}
+.leftTOP{
+    margin-top: -5px;
+    top: 0;
+    left: 0;
+    margin-left: -5px;
+}

@@ -2,11 +2,19 @@ import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card, Input, Button, Table } from "antd";
+import {useHistory} from 'react-router-dom'
 interface HomeList {
   title: string;
   count: number;
 }
 export default function UserList() {
+  let router = useHistory();
+  const jumpToPage = (url: string, id?: number) => {
+    router.push({
+      pathname: url,
+      search: id?`?id=${id}`:'',
+    });
+  };
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
@@ -71,7 +79,7 @@ export default function UserList() {
           <Button className={style.mr20} type={"primary"}>
             删除
           </Button>
-          <Button type={"primary"}>新增</Button>
+          <Button type={"primary"} onClick={()=>jumpToPage('/editTemplate')}>新增</Button>
         </div>
       </Card>
       <div>

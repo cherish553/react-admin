@@ -3,6 +3,7 @@ import { HashRouter, Route, Switch } from "react-router-dom";
 import home from "@/page/home";
 import userList from "@/page/userList";
 import template from "@/page/template";
+import editTemplate from "@/page/template/editTemplate";
 import print from "@/page/print";
 import category from "@/page/print/category";
 import editPrint from "@/page/print/editPrint";
@@ -41,6 +42,7 @@ const BasicRoute = () => {
               <Content
                 className="site-layout-background"
                 style={{
+                  overflow:'auto',
                   padding: 24,
                   margin: 0,
                   minHeight: 280,
@@ -49,6 +51,7 @@ const BasicRoute = () => {
                 <Route exact path="/" component={home} />
                 <Route exact path="/userList" component={userList} />
                 <Route exact path="/template" component={template} />
+                <Route exact path="/editTemplate" component={editTemplate} />
                 <Route exact path="/print" component={print} />
                 <Route exact path="/category" component={category} />
                 <Route exact path="/editPrint" component={editPrint} />
