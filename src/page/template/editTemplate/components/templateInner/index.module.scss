@@ -7,62 +7,81 @@
     background-color: white;
     position: relative;
 }
-.flex{
-    @include flex(_,flex-start);
+
+.flex {
+    @include flex(_, flex-start);
 }
-.abs{
+
+.abs {
     position: absolute;
 }
-.circle{
+
+.circle {
     width: 10px;
     height: 10px;
     background-color: red;
     position: absolute;
     border-radius: 50%;
 }
-.right{
+
+.right {
+    cursor: e-resize;
     top: 50%;
     margin-top: -5px;
     right: 0;
-    margin-right:-5px;
+    margin-right: -5px;
 }
-.bottom{
+
+.bottom {
+    cursor: s-resize;
     left: 50%;
     margin-left: -5px;
     margin-bottom: -5px;
     bottom: 0;
 }
-.left{
+
+.left {
+    cursor: w-resize;
     top: 50%;
     left: 0;
     margin-left: -5px;
     margin-top: -5px;
 }
-.top{
+
+.top {
+    cursor: n-resize;
     margin-top: -5px;
     top: 0;
     left: 50%;
     margin-left: -5px;
 }
-.rightTOP{
+
+.rightTOP {
+    cursor: ne-resize;
     margin-top: -5px;
     top: 0;
     left: 100%;
     margin-left: -5px;
 }
-.leftBottom{
+
+.leftBottom {
+    cursor: sw-resize;
     left: 0;
     margin-left: -5px;
     margin-bottom: -5px;
     bottom: 0;
 }
-.rightBottom{
+
+.rightBottom {
+    cursor: se-resize;
     left: 100%;
     margin-left: -5px;
     margin-bottom: -5px;
     bottom: 0;
 }
-.leftTOP{
+
+.leftTOP {
+    cursor: nw-resize;
     margin-top: -5px;
     top: 0;
     left: 0;

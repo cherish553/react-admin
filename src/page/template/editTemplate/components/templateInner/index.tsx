@@ -1,7 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Form, Radio, Button } from "antd";
+let now = "";
+interface Datas {
+  height: string;
+  width: string;
+  background: string;
+  left: string;
+  top: string;
+}
 export default function TemplateInner() {
   const canvas = useRef();
   const [checked, setChecked] = useState(1);
@@ -14,141 +22,155 @@ export default function TemplateInner() {
   });
   const [flag, setFlag] = useState(false);
   const [flag1, setFlag1] = useState(false);
-  const onChange = (e: any) => {
-    console.log("radio checked", e.target.value);
-    setChecked(e.target.value);
-  };
-  const onMouseDown = (e: any) => {
-    //   for(const item in e){
-    if (e.target.tagName === "SPAN") {
-      setFlag1(true);
-      return;
-    }
-    //   }
-    // console.log(flag);
-    setFlag(true);
-    move(e);
-    // setImage1({
-    //   ...image1,
-    //   left: `${e.target.offsetLeft + e.nativeEvent.offsetX - 50}px`,
-    //   top: `${e.target.offsetTop + e.nativeEvent.offsetY - 50}px`,
-    // });
-    // console.log(e.target.offsetLeft+e.nativeEvent.offsetX/2-50)
-    // console.log(e.target.offsetLeft)
-    // console.log(e.target.style.width)
-    // console.log(e.target.style.height)
-    // console.log(e.target.offsetHeight);
-    // console.log(e.target.offsetWidth);
-    // console.log(e.nativeEvent.offsetX);
+  const [target, setTarget] = useState("");
+  const [parent, setParent] = useState({
+    width: 0,
+    height: 0,
+  });
+  let left = 0;
+  let top = 0;
+  useEffect(() => {
+    setParent({
+      width: (canvas as any).current.offsetWidth,
+      height: (canvas as any).current.offsetHeight,
+    });
+  }, []);
+  const [nodeList, setNodeList] = useState<any>({
+    main1: {
+      height: "100px",
+      width: "100px",
+      background: "skyblue",
+      left: "100px",
+      top: "100px",
+    },
+    main2: {
+      height: "100px",
+      width: "100px",
+      background: "skyblue",
+      left: "100px",
+      top: "100px",
+    },
+  });
+  let width = 0;
+  let height = 0;
 
-    // console.log(e.nativeEvent.offsetY);
-  };
-  const move = (e: any) => {
-    const X = e.target.offsetLeft + e.nativeEvent.offsetX;
-    const Y = e.target.offsetTop + e.nativeEvent.offsetY;
-    const width = e.target.offsetWidth;
-    const height = e.target.offsetHeight;
-    let left = 0;
-    let top = 0;
-    const parentWidth = (canvas as any).current.offsetWidth;
-    const parentHeight = (canvas as any).current.offsetHeight;
+  const drag = (e: any) => {
+    let X = e.clientX;
+    let Y = e.clientY;
+    X = X - (canvas as any).current.offsetLeft;
+    Y = Y - (canvas as any).current.offsetTop;
+
+    width = parseFloat((nodeList[now] as Datas).width.slice(0, -2));
+    height = parseFloat((nodeList[now] as Datas).height.slice(0, -2));
     if (X - width / 2 > 0) {
-      if (parentWidth - width / 2 < X) {
-        left = parentWidth - width;
+      if (parent.width - width / 2 < X) {
+        left = parent.width - width;
       } else {
         left = X - width / 2;
       }
     } else {
       left = 0;
     }
+
     if (Y - height / 2 > 0) {
-      if (parentHeight - height / 2 < Y) {
-        top = parentHeight - height;
+      if (parent.height - height / 2 < Y) {
+        top = parent.height - height;
       } else {
         top = Y - height / 2;
       }
     } else {
       top = 0;
     }
-    // const top = Y - height / 2 > 0 ? Y - height / 2 : 0;
-    setImage1({
-      ...image1,
-      left: `${left}px`,
-      top: `${top}px`,
+    const nowData = nodeList[now] as Datas;
+    setNodeList({
+      ...nodeList,
+      [now]: {
+        ...nowData,
+        left: `${left}px`,
+        top: `${top}px`,
+      },
     });
   };
+  const onChange = (e: any) => {
+    // console.log("radio checked", e.target.value);
+    setChecked(e.target.value);
+  };
   const onMouseUp = (e: any) => {
-    setFlag(false);
-    // console.log(e.clientX);
+    window.removeEventListener("mousemove", drag);
   };
-  const onMouseMove = (e: any) => {
-    if (!flag) {
-      if (flag1 && e.target.tagName === "SPAN") {
-        // console.log(e.nativeEvent.offsetX);
-        setImage1({
-          ...image1,
-          width: `${
-            parseFloat(image1.width.slice(0, -2)) + e.nativeEvent.offsetX - 5
-          }px`,
-        });
-      }
-      return;
-    }
-    move(e);
-  };
-  const onLeftMouseMove = (e: any) => {
-    console.log(e);
-  };
-  const spanMove = (e: any) => {
-    console.log(e);
+  // const onMouseMove = (e: any) => {
+  // if (!flag) return;
+  //   move(e);
+  // };
+  const onMouseDown = (e: any) => {
+    now = e.target.getAttribute("data-type");
+    setTarget(now);
+    if (!now) return;
+    setFlag(true);
+   
+    window.addEventListener("mousemove", drag);
+    window.addEventListener("mouseup", onMouseUp);
+    // move(e);
   };
   return (
     <div className={style.flex}>
-      <div ref={canvas as any} className={style.canvas}>
-        <div
-          //   draggable={true}
-          onMouseUp={(e) => onMouseUp(e)}
-          onMouseMove={(e) => onMouseMove(e)}
-          onMouseDown={(e) => onMouseDown(e)}
-          className={style.abs}
-          style={image1}
-        >
-          <span className={classnames(style.circle, style.right)}></span>
-          <span
-            onClick={(e) => {
-              console.log(123);
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            onMouseUp={(e) => {
-              console.log(123);
-              e.stopPropagation();
-              e.preventDefault();
-              //   onLeftMouseUp(e);
-            }}
-            onMouseMove={(e) => {
-              console.log(123);
-              e.stopPropagation();
-              e.preventDefault();
-              onLeftMouseMove(e);
-            }}
-            onMouseDown={(e) => {
-              console.log(123);
-              e.stopPropagation();
-              e.preventDefault();
-              console.log(e);
-              //   onLeftMouseDown(e);
-            }}
-            className={classnames(style.circle, style.left)}
-          ></span>
-          <span className={classnames(style.circle, style.top)}></span>
-          <span className={classnames(style.circle, style.bottom)}></span>
-          <span className={classnames(style.circle, style.rightTOP)}></span>
-          <span className={classnames(style.circle, style.leftTOP)}></span>
-          <span className={classnames(style.circle, style.rightBottom)}></span>
-          <span className={classnames(style.circle, style.leftBottom)}></span>
+      <div
+        ref={canvas as any}
+        // onMouseUp={(e) => onMouseUp(e)}
+        // onMouseMove={(e) => onMouseMove(e)}
+        onMouseDown={(e) => onMouseDown(e)}
+        className={style.canvas}
+      >
+        <div key={"main1"} data-type="main1" className={style.abs} style={nodeList["main1"]}>
+          {target === "main1"
+            ? [
+                <span key={Math.random()} className={classnames(style.circle, style.right)}></span>,
+                <span key={Math.random()} className={classnames(style.circle, style.left)}></span>,
+                <span key={Math.random()} className={classnames(style.circle, style.top)}></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.bottom)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.rightTOP)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.leftTOP)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.rightBottom)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.leftBottom)}
+                ></span>,
+              ]
+            : ""}
+        </div>
+        <div key={"main2"} data-type="main2" className={style.abs} style={nodeList["main2"]}>
+        {target === "main2"
+            ? [
+                <span key={Math.random()} className={classnames(style.circle, style.right)}></span>,
+                <span key={Math.random()} className={classnames(style.circle, style.left)}></span>,
+                <span key={Math.random()} className={classnames(style.circle, style.top)}></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.bottom)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.rightTOP)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.leftTOP)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.rightBottom)}
+                ></span>,
+                <span key={Math.random()}
+                  className={classnames(style.circle, style.leftBottom)}
+                ></span>,
+              ]:''
+            }
         </div>
       </div>
+
       <Form>
         <Form.Item label="选择编辑页">
           <Radio.Group onChange={onChange} value={checked}>
