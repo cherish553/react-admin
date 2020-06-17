@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useHistory } from "react-router-dom";
-import { getAdminLogin as GetAdminLogin } from "@api/index";
+// import { getAdminLogin as GetAdminLogin } from "@api/index";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card } from "antd";
@@ -11,20 +11,20 @@ interface HomeList {
 export default function Home(aa: any) {
   // const router = useHistory();
   useEffect(() => {
-    getAdminLogin();
+    // getAdminLogin();
     // console.log(router)
     // console.log(a)
     // Update the document title using the browser API
     // document.title = `You clicked ${count} times`;
   }, []);
-  const getAdminLogin = async () => {
-    console.log(process.env);
-    const data = await GetAdminLogin({
-      mobile: "13687607337",
-      password: "11111111",
-    });
-    console.log(data);
-  };
+  // const getAdminLogin = async () => {
+  //   console.log(process.env);
+  //   const data = await GetAdminLogin({
+  //     mobile: "13687607337",
+  //     password: "11111111",
+  //   });
+  //   console.log(data);
+  // };
   const [homeList, setList] = useState([
     {
       title: "用户数",

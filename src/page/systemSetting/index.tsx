@@ -3,12 +3,20 @@ import style from "./index.module.scss";
 import { useHistory } from "react-router-dom";
 import classnames from "classnames";
 import { Card, Input, Button, Table, Form } from "antd";
+import { getBannerList as GetBannerList } from "@api/systemSetting";
 interface HomeList {
   title: string;
   count: number;
 }
 export default function SystemSetting() {
   let router = useHistory();
+  useEffect(() => {
+    getBannerList();
+  }, []);
+  const getBannerList = async () => {
+    const data = await GetBannerList();
+    console.log(data);
+  };
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
@@ -35,10 +43,10 @@ export default function SystemSetting() {
       name: record.name,
     }),
   });
-  const jumpToPage = (url: string, id?:number) => {
+  const jumpToPage = (url: string, id?: number) => {
     router.push({
       pathname: url,
-      search: id?`?id=${id}`:'',
+      search: id ? `?id=${id}` : "",
     });
   };
   const [userColumn, setuserColumn] = useState([
@@ -59,7 +67,9 @@ export default function SystemSetting() {
       dataIndex: "",
       render: (_: any, e: any) => (
         <>
-          <Button   onClick={() => jumpToPage("/editBanner",1)} size={"small"}>编辑</Button>
+          <Button onClick={() => jumpToPage("/editBanner", 1)} size={"small"}>
+            编辑
+          </Button>
           <Button size={"small"}>删除</Button>
         </>
       ),
@@ -81,10 +91,7 @@ export default function SystemSetting() {
         <div className={style.search}>
           <div>
             <Button type={"primary"}>删除</Button>
-            <Button
-              onClick={() => jumpToPage("/editBanner")}
-              type={"primary"}
-            >
+            <Button onClick={() => jumpToPage("/editBanner")} type={"primary"}>
               新增轮播图
             </Button>
           </div>

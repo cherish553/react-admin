@@ -17,8 +17,10 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   response => {
     const {
-      data: { data, code, message },
+      data: { data, code },
     } = response
+    console.log(data)
+    console.log(code)
     if (code === 0) return data
     return false
   },
@@ -27,7 +29,7 @@ http.interceptors.response.use(
   }
 )
 
-export const get = <T>(url: string, params: object): Promise<T> =>
+export const get = <T>(url: string, params?: object): Promise<T> =>
   http.get(url, { params })
 export const post = http.post
 export const put = http.put

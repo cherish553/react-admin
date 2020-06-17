@@ -28,5 +28,6 @@ export const routerObj: RouterObj = {
     '/systemSetting':'系统设置',
     '/editBanner':'添加图片',
     '/editBannerSearch':'编辑图片',
+    '/login':'登录'
 }
 

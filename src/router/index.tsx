@@ -23,6 +23,7 @@ import withdrawalLog from "@/page/commission/withdrawalLog";
 import dataStatistics from "@/page/dataStatistics";
 import systemSetting from "@/page/systemSetting";
 import editBanner from "@/page/systemSetting/editBanner";
+import login from "@/page/login";
 
 import Sider from "@/layout/Sider";
 import Top from "@/layout/Top";
@@ -34,6 +35,7 @@ const BasicRoute = () => {
   return (
     <HashRouter>
       <Switch>
+      <Route exact path="/login" component={login} />
         <Layout>
           <Layout>
             <Sider></Sider>
