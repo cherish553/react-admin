@@ -299,6 +299,8 @@ module.exports = function(webpackEnv) {
         }),
         '@':paths.appSrc,
         '@page':paths.appPage,
+        '@axios':paths.axios,
+        '@api':paths.api,
         ...(modules.webpackAliases || {}),
       },
       plugins: [
