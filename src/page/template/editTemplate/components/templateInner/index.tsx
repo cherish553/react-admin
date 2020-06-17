@@ -3,6 +3,11 @@ import style from "./index.module.scss";
 import classnames from "classnames";
 import { Form, Radio, Button } from "antd";
 let now = "";
+let dot = "";
+interface DotFunc {
+  rightTOP: Function;
+}
+
 interface Datas {
   height: string;
   width: string;
@@ -97,21 +102,37 @@ export default function TemplateInner() {
   };
   const onMouseUp = (e: any) => {
     window.removeEventListener("mousemove", drag);
+    window.removeEventListener("mousemove", changeWidth);
   };
   // const onMouseMove = (e: any) => {
   // if (!flag) return;
   //   move(e);
   // };
+  const changeWidth = (e: any) => {
+    // const left = e.target.parentNode.offsetLeft
+    console.log(e.target.offsetLeft)
+  };
+  const dotFunc: DotFunc = {
+    rightTOP: () => {
+      window.addEventListener("mousemove", changeWidth);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+  };
   const onMouseDown = (e: any) => {
     now = e.target.getAttribute("data-type");
+    dot = e.target.getAttribute("data-dot");
     setTarget(now);
-    if (!now) return;
-    setFlag(true);
-   
+    console.log(dot);
+    console.log(now);
+    if (!now && !dot) return;
+    if (dot) {
+      dotFunc[dot as keyof DotFunc](now);
+      return;
+    }
     window.addEventListener("mousemove", drag);
     window.addEventListener("mouseup", onMouseUp);
-    // move(e);
   };
+
   return (
     <div className={style.flex}>
       <div
@@ -121,54 +142,94 @@ export default function TemplateInner() {
         onMouseDown={(e) => onMouseDown(e)}
         className={style.canvas}
       >
-        <div key={"main1"} data-type="main1" className={style.abs} style={nodeList["main1"]}>
+        <div
+          key={"main1"}
+          data-type="main1"
+          className={style.abs}
+          style={nodeList["main1"]}
+        >
           {target === "main1"
             ? [
-                <span key={Math.random()} className={classnames(style.circle, style.right)}></span>,
-                <span key={Math.random()} className={classnames(style.circle, style.left)}></span>,
-                <span key={Math.random()} className={classnames(style.circle, style.top)}></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
+                  className={classnames(style.circle, style.right)}
+                ></span>,
+                <span
+                  key={Math.random()}
+                  className={classnames(style.circle, style.left)}
+                ></span>,
+                <span
+                  key={Math.random()}
+                  className={classnames(style.circle, style.top)}
+                ></span>,
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.bottom)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  data-type="main1"
+                  data-dot="rightTOP"
+                  key={Math.random()}
                   className={classnames(style.circle, style.rightTOP)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.leftTOP)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.rightBottom)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.leftBottom)}
                 ></span>,
               ]
             : ""}
         </div>
-        <div key={"main2"} data-type="main2" className={style.abs} style={nodeList["main2"]}>
-        {target === "main2"
+        {/* <div
+          key={"main2"}
+          data-type="main2"
+          className={style.abs}
+          style={nodeList["main2"]}
+        >
+          {target === "main2"
             ? [
-                <span key={Math.random()} className={classnames(style.circle, style.right)}></span>,
-                <span key={Math.random()} className={classnames(style.circle, style.left)}></span>,
-                <span key={Math.random()} className={classnames(style.circle, style.top)}></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
+                  className={classnames(style.circle, style.right)}
+                ></span>,
+                <span
+                  key={Math.random()}
+                  className={classnames(style.circle, style.left)}
+                ></span>,
+                <span
+                  key={Math.random()}
+                  className={classnames(style.circle, style.top)}
+                ></span>,
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.bottom)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.rightTOP)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.leftTOP)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.rightBottom)}
                 ></span>,
-                <span key={Math.random()}
+                <span
+                  key={Math.random()}
                   className={classnames(style.circle, style.leftBottom)}
                 ></span>,
-              ]:''
-            }
-        </div>
+              ]
+            : ""}
+        </div> */}
       </div>
 
       <Form>
