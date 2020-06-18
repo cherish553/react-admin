@@ -17,11 +17,12 @@
 }
 
 .circle {
+    z-index:100;
     width: 10px;
     height: 10px;
     background-color: red;
     position: absolute;
-    border-radius: 50%;
+    // border-radius: 50%;
 }
 
 .right {
@@ -29,14 +30,14 @@
     top: 50%;
     margin-top: -5px;
     right: 0;
-    margin-right: -5px;
+    margin-right: -10px;
 }
 
 .bottom {
     cursor: s-resize;
     left: 50%;
     margin-left: -5px;
-    margin-bottom: -5px;
+    margin-bottom: -10px;
     bottom: 0;
 }
 
@@ -44,13 +45,13 @@
     cursor: w-resize;
     top: 50%;
     left: 0;
-    margin-left: -5px;
+    margin-left: -10px;
     margin-top: -5px;
 }
 
 .top {
     cursor: n-resize;
-    margin-top: -5px;
+    margin-top: -10px;
     top: 0;
     left: 50%;
     margin-left: -5px;
@@ -58,32 +59,32 @@
 
 .rightTOP {
     cursor: ne-resize;
-    margin-top: -5px;
+    margin-top:-10px;
     top: 0;
     left: 100%;
-    margin-left: -5px;
+    // margin-left:-10px;
 }
 
 .leftBottom {
     cursor: sw-resize;
     left: 0;
-    margin-left: -5px;
-    margin-bottom: -5px;
+    margin-left: -10px;
+    margin-bottom: -10px;
     bottom: 0;
 }
 
 .rightBottom {
     cursor: se-resize;
     left: 100%;
-    margin-left: -5px;
-    margin-bottom: -5px;
+    // margin-left: -10px;
+    margin-bottom: -10px;
     bottom: 0;
 }
 
 .leftTOP {
     cursor: nw-resize;
-    margin-top: -5px;
+    margin-top: -10px;
     top: 0;
     left: 0;
-    margin-left: -5px;
+    margin-left: -10px;
 }
