@@ -4,32 +4,22 @@ import { useHistory } from "react-router-dom";
 import classnames from "classnames";
 import { Card, Input, Button, Table, Form } from "antd";
 import { getBannerList as GetBannerList } from "@api/systemSetting";
-interface HomeList {
-  title: string;
-  count: number;
-}
+import { BannerDataDetail } from "@api/systemSetting/api";
+
 export default function SystemSetting() {
   let router = useHistory();
   useEffect(() => {
     getBannerList();
   }, []);
+  // 获取轮播图列表
   const getBannerList = async () => {
-    const data = await GetBannerList();
-    console.log(data);
+    setuserList(await GetBannerList());
   };
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
   });
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      lastLoginDate: "2020-6-5",
-    },
-  ]);
+  const [userList, setuserList] = useState<Array<BannerDataDetail> | []>([]);
   const [rowSelection] = useState({
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       console.log(
@@ -49,18 +39,24 @@ export default function SystemSetting() {
       search: id ? `?id=${id}` : "",
     });
   };
-  const [userColumn, setuserColumn] = useState([
+  const [userColumn] = useState([
     {
       title: "轮播图",
-      dataIndex: "userName",
+      dataIndex: "img_url",
+      render: (props: string, row: BannerDataDetail) => (
+        <>
+          <img src={props} alt="" />
+          <p>{row.title}</p>
+        </>
+      ),
     },
     {
       title: "排序",
-      dataIndex: "phone",
+      dataIndex: "sort",
     },
     {
       title: "跳转地址",
-      dataIndex: "dealCount",
+      dataIndex: "jump_link",
     },
     {
       title: "操作",
@@ -99,6 +95,7 @@ export default function SystemSetting() {
       </Card>
       <div>
         <Table
+          pagination={false}
           rowSelection={{
             type: "checkbox",
             ...rowSelection,

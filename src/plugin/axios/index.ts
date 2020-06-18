@@ -1,15 +1,24 @@
 import axios from 'axios'
+import cookie from 'js-cookie'
 const http = axios.create({
   baseURL: `/api`,
 })
 
 http.interceptors.request.use(
   config => {
-    console.log(config)
-    // if (token) config.headers['token'] = token
+    const token = cookie.get('token')
+    if (token) {
+      if (config.method === "get") {
+        config.params = config.params || {};
+        config.params = { ...config.params, api_token: token }
+      } else {
+        config.data = config.data || {};
+        config.data = { ...config.data, api_token: token }
+      }
+    }
     return config
   },
-  function(error) {
+  function (error) {
     return Promise.reject(error)
   }
 )
@@ -19,8 +28,6 @@ http.interceptors.response.use(
     const {
       data: { data, code },
     } = response
-    console.log(data)
-    console.log(code)
     if (code === 0) return data
     return false
   },

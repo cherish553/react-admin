@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Upload } from "antd";
+import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
+
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-import style from './index.module.scss'
+import style from "./index.module.scss";
 const layout = {
   labelCol: { span: 3 },
 };
@@ -30,15 +32,11 @@ export default function EditBanner() {
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
   };
-  const handleChange = (info: any) => {
-    if (info.file.status === "uploading") {
-      // this.setState({ loading: true });
-      return;
-    }
-    if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (imageUrl: any) => setImageUrl);
-    }
+  // 上传之前的处理
+  const handleChange = (info: UploadChangeParam<UploadFile<any>>) => {
+    // URL.revokeObjectURL() 
+    const url = window.URL.createObjectURL(info.file);
+    setImageUrl(url);
   };
   const uploadButton = (
     <div>
@@ -46,7 +44,7 @@ export default function EditBanner() {
       <div className="ant-upload-text">上传图片</div>
     </div>
   );
-  const [imageUrl, setImageUrl] = useState();
+  const [imageUrl, setImageUrl] = useState<string>();
   return (
     <Form {...layout} labelAlign="left">
       <Form.Item label="轮播图简称">
@@ -61,8 +59,7 @@ export default function EditBanner() {
           listType="picture-card"
           className="avatar-uploader"
           showUploadList={false}
-          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-          beforeUpload={beforeUpload}
+          beforeUpload={() => false}
           onChange={handleChange}
         >
           {imageUrl ? (
