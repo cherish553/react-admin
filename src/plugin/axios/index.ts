@@ -7,15 +7,7 @@ const http = axios.create({
 http.interceptors.request.use(
   config => {
     const token = cookie.get('token')
-    if (token) {
-      if (config.method === "get") {
-        config.params = config.params || {};
-        config.params = { ...config.params, api_token: token }
-      } else {
-        config.data = config.data || {};
-        config.data = { ...config.data, api_token: token }
-      }
-    }
+    config.headers["Authorization"] = `Bearer ${token}`
     return config
   },
   function (error) {
@@ -32,6 +24,10 @@ http.interceptors.response.use(
     return false
   },
   error => {
+    if (error.response.status === 401) {
+      const url = window.location.href
+      window.location.href = url.slice(0, url.match('#')!.index! + 1) + '/login'
+    }
     return Promise.resolve(false)
   }
 )

@@ -12,3 +12,4 @@ export interface BannerDataDetail {
    title: string
    updated_at: string
 }
+export type BannerDetail = Pick<BannerDataDetail, "img_url" | "jump_link" | "title"> & { sort: number | undefined | string }

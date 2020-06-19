@@ -13,13 +13,14 @@ export default function SystemSetting() {
   }, []);
   // 获取轮播图列表
   const getBannerList = async () => {
-    setuserList(await GetBannerList());
+    const data = await GetBannerList();
+    setBannerList(data);
   };
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
   });
-  const [userList, setuserList] = useState<Array<BannerDataDetail> | []>([]);
+  const [bannerList, setBannerList] = useState<Array<BannerDataDetail> | []>([]);
   const [rowSelection] = useState({
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       console.log(
@@ -39,7 +40,7 @@ export default function SystemSetting() {
       search: id ? `?id=${id}` : "",
     });
   };
-  const [userColumn] = useState([
+  const [bannerColumn] = useState([
     {
       title: "轮播图",
       dataIndex: "img_url",
@@ -61,12 +62,18 @@ export default function SystemSetting() {
     {
       title: "操作",
       dataIndex: "",
-      render: (_: any, e: any) => (
+      render: (props: any, row: any) => (
         <>
-          <Button onClick={() => jumpToPage("/editBanner", 1)} size={"small"}>
+          <Button
+            key={1}
+            onClick={() => jumpToPage("/editBanner", props.id)}
+            size={"small"}
+          >
             编辑
           </Button>
-          <Button size={"small"}>删除</Button>
+          <Button key={2} size={"small"}>
+            删除
+          </Button>
         </>
       ),
     },
@@ -95,13 +102,14 @@ export default function SystemSetting() {
       </Card>
       <div>
         <Table
+          rowKey="id"
           pagination={false}
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
           }}
-          columns={userColumn}
-          dataSource={userList}
+          columns={bannerColumn}
+          dataSource={bannerList}
         ></Table>
       </div>
     </div>
