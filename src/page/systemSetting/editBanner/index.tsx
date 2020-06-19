@@ -29,7 +29,7 @@ export default function EditBanner() {
     setId(id);
   }, [router]);
   // 添加banner
-  const BannerDetail = async () => {
+  const bannerDetail = async () => {
     if (!(await validate(form))) return;
     const img_url = await postUploadImage(file);
     if (typeof img_url === "boolean") return;
@@ -59,7 +59,7 @@ export default function EditBanner() {
   };
   // 点击上传
   const confirm = async () => {
-    if (!id) return BannerDetail();
+    if (!id) return bannerDetail();
     editBanner();
   };
   // 上传之前的处理
