@@ -2,37 +2,28 @@ import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 import { useHistory } from "react-router-dom";
 import classnames from "classnames";
-import { Card, Input, Button, Table, Form } from "antd";
-import { getBannerList as GetBannerList } from "@api/systemSetting";
+import { Card, Input, Button, Table, Form, message, Modal } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { getBannerList, delBanner as DelBanner } from "@api/systemSetting";
 import { BannerDataDetail } from "@api/systemSetting/api";
+import { useTableHook } from "@/hooks";
+const { confirm } = Modal;
 
 export default function SystemSetting() {
   let router = useHistory();
-  useEffect(() => {
-    getBannerList();
-  }, []);
-  // 获取轮播图列表
-  const getBannerList = async () => {
-    const data = await GetBannerList();
-    setBannerList(data);
-  };
+  const [dataList] = useTableHook<BannerDataDetail>(getBannerList);
+  const [delBannerIds, setDelBannerIds] = useState<Array<number>>([]);
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
   });
-  const [bannerList, setBannerList] = useState<Array<BannerDataDetail> | []>([]);
   const [rowSelection] = useState({
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
+    onChange: (
+      _selectedRowKeys: React.Key[],
+      selectedRows: Array<BannerDataDetail>
+    ) => {
+      setDelBannerIds(selectedRows.map((item) => item.id));
     },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-    }),
   });
   const jumpToPage = (url: string, id?: number) => {
     router.push({
@@ -40,6 +31,20 @@ export default function SystemSetting() {
       search: id ? `?id=${id}` : "",
     });
   };
+  // 弹窗确定删除
+  function showDeleteConfirm(ids: Array<number>) {
+    if (!ids.length) return message.error("至少选择一条数据");
+    confirm({
+      title: "确定删除数据?",
+      icon: <ExclamationCircleOutlined />,
+      okText: "确定",
+      okType: "danger",
+      cancelText: "取消",
+      onOk() {
+        delBanner(ids);
+      },
+    });
+  }
   const [bannerColumn] = useState([
     {
       title: "轮播图",
@@ -71,13 +76,25 @@ export default function SystemSetting() {
           >
             编辑
           </Button>
-          <Button key={2} size={"small"}>
+          <Button
+            key={2}
+            size={"small"}
+            onClick={() => showDeleteConfirm([props.id])}
+          >
             删除
           </Button>
         </>
       ),
     },
   ]);
+  // 删除轮播图列表
+  const delBanner = async (ids: Array<number>) => {
+    const data = await DelBanner({ id: ids.join(",") });
+    if (!data) return;
+    setDelBannerIds([]);
+    message.success("删除成功");
+    getBannerList();
+  };
   return (
     <div>
       <Card className="border-none" title="后台账号密码设置">
@@ -93,7 +110,12 @@ export default function SystemSetting() {
       <Card className={classnames(style.w100)}>
         <div className={style.search}>
           <div>
-            <Button type={"primary"}>删除</Button>
+            <Button
+              type={"primary"}
+              onClick={() => showDeleteConfirm(delBannerIds)}
+            >
+              删除
+            </Button>
             <Button onClick={() => jumpToPage("/editBanner")} type={"primary"}>
               新增轮播图
             </Button>
@@ -109,7 +131,7 @@ export default function SystemSetting() {
             ...rowSelection,
           }}
           columns={bannerColumn}
-          dataSource={bannerList}
+          dataSource={dataList}
         ></Table>
       </div>
     </div>

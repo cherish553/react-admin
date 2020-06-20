@@ -36,4 +36,5 @@ export const get = <T>(url: string, params?: object): Promise<T> =>
   http.get(url, { params })
 export const post = http.post
 export const put = http.put
-export const del = http.delete
+export const del = <T>(url: string, params?: object): Promise<T> =>
+  http.delete(url, { params })

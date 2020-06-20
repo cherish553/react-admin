@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card, Input, Button, Table } from "antd";
-import { getUserList as GetUserList } from "@api/userList";
-import { UserData } from "@api/userList/api";
+import { getUserList } from "@api/userList";
+import { UserData, UserParmas } from "@api/userList/api";
+import { useTableHook } from "@/hooks";
 export default function UserList() {
-  const [pagination, setPagination] = useState({
-    page: 1,
-    total: 0,
-  });
   const [serachForm, setSerachForm] = useState({
     name: "",
     mobile: "",
   });
-  const [userList, setuserList] = useState<Array<UserData>>([]);
+  const [dataList, pagination, setPagination, getDataList] = useTableHook<
+    UserData,
+    UserParmas
+  >(getUserList, serachForm);
   const [userColumn] = useState([
     {
       title: "用户昵称",
@@ -32,19 +32,6 @@ export default function UserList() {
       dataIndex: "last_login",
     },
   ]);
-  useEffect(() => {
-    getUserList();
-  }, []);
-  const getUserList = async (flag?: boolean) => {
-    if (flag) setPagination({ ...pagination, page: 1 });
-    const data = await GetUserList(serachForm);
-    const { data: userList, current_page, total } = data;
-    setuserList(userList);
-    setPagination({
-      page: current_page,
-      total,
-    });
-  };
 
   return (
     <div>
@@ -85,7 +72,7 @@ export default function UserList() {
             <Button
               onClick={() => {
                 setPagination({ ...pagination, page: 1 });
-                getUserList();
+                getDataList();
               }}
               type={"primary"}
             >
@@ -99,7 +86,7 @@ export default function UserList() {
           rowKey="id"
           pagination={{ current: pagination.page, total: pagination.total }}
           columns={userColumn}
-          dataSource={userList}
+          dataSource={dataList}
         ></Table>
       </div>
     </div>

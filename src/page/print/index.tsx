@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
-// import classnames from "classnames";
+import { useTableHook } from "@/hooks";
 import { useHistory } from "react-router-dom";
+import { getGoodList } from "@api/print";
+import { GoodListData } from "@api/print/api";
 import { Card, Button, Table } from "antd";
-interface HomeList {
-  title: string;
-  count: number;
-}
 interface Obj {
   pathname: string;
   search?: string;
 }
 export default function Category() {
+  const [dataList, pagination] = useTableHook<GoodListData>(getGoodList);
   const router = useHistory();
   const jumpToPage = (url: string, id?: number) => {
     console.log(id);
-    let obj:Obj = {
+    let obj: Obj = {
       pathname: url,
     };
     if (id) {
@@ -23,22 +22,7 @@ export default function Category() {
     }
     router.push(obj);
   };
-  const [serachForm, setSerachForm] = useState({
-    userName: "cherish",
-    phone: "15628771443",
-  });
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      lastLoginDate: "2020-6-5",
-      a: "1",
-      b: "1",
-      c: "1",
-    },
-  ]);
+  // const [goodList, setDataList] = useState<Array<GoodListData> | []>([]);
   const [rowSelection] = useState({
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       console.log(
@@ -52,14 +36,17 @@ export default function Category() {
       name: record.name,
     }),
   });
-  const [userColumn, setuserColumn] = useState([
+  const [goodColumn] = useState([
     {
       title: "印品",
-      dataIndex: "userName",
+      dataIndex: "name",
     },
     {
       title: "属于类目",
-      dataIndex: "phone",
+      dataIndex: "class_info",
+      render: (_props: any, row: GoodListData) => {
+        return <>{row?.class_info?.name}</>;
+      },
     },
     {
       title: "售价",
@@ -71,7 +58,7 @@ export default function Category() {
     },
     {
       title: "添加时间",
-      dataIndex: "b",
+      dataIndex: "created_time",
     },
     {
       title: "是否为添加印品",
@@ -118,12 +105,14 @@ export default function Category() {
       <Button type={"primary"}>批量设置推荐</Button>
       <div>
         <Table
+          rowKey="id"
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
           }}
-          columns={userColumn}
-          dataSource={userList}
+          pagination={{ current: pagination.page, total: pagination.total }}
+          columns={goodColumn}
+          dataSource={dataList}
         ></Table>
       </div>
     </div>
