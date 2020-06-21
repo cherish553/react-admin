@@ -18,3 +18,7 @@ export interface GoodListData {
 interface ClassInfo {
    name: string
 }
+export interface EditGoodClass {
+   id?: number
+   name: string
+}

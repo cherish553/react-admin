@@ -3,27 +3,21 @@ import style from "./index.module.scss";
 import { useHistory } from "react-router-dom";
 import classnames from "classnames";
 import { Card, Input, Button, Table, Form, message, Modal } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { getBannerList, delBanner as DelBanner } from "@api/systemSetting";
+import { getBannerList, delBanner } from "@api/systemSetting";
 import { BannerDataDetail } from "@api/systemSetting/api";
-import { useTableHook } from "@/hooks";
-const { confirm } = Modal;
+import { useTableHook, useDelData } from "@/hooks";
 
 export default function SystemSetting() {
   let router = useHistory();
-  const [dataList] = useTableHook<BannerDataDetail>(getBannerList);
-  const [delBannerIds, setDelBannerIds] = useState<Array<number>>([]);
+  const [dataList, , , getDataList] = useTableHook<BannerDataDetail>(
+    getBannerList
+  );
+  const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<
+    BannerDataDetail
+  >(delBanner, getDataList);
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
-  });
-  const [rowSelection] = useState({
-    onChange: (
-      _selectedRowKeys: React.Key[],
-      selectedRows: Array<BannerDataDetail>
-    ) => {
-      setDelBannerIds(selectedRows.map((item) => item.id));
-    },
   });
   const jumpToPage = (url: string, id?: number) => {
     router.push({
@@ -31,20 +25,6 @@ export default function SystemSetting() {
       search: id ? `?id=${id}` : "",
     });
   };
-  // 弹窗确定删除
-  function showDeleteConfirm(ids: Array<number>) {
-    if (!ids.length) return message.error("至少选择一条数据");
-    confirm({
-      title: "确定删除数据?",
-      icon: <ExclamationCircleOutlined />,
-      okText: "确定",
-      okType: "danger",
-      cancelText: "取消",
-      onOk() {
-        delBanner(ids);
-      },
-    });
-  }
   const [bannerColumn] = useState([
     {
       title: "轮播图",
@@ -87,14 +67,6 @@ export default function SystemSetting() {
       ),
     },
   ]);
-  // 删除轮播图列表
-  const delBanner = async (ids: Array<number>) => {
-    const data = await DelBanner({ id: ids.join(",") });
-    if (!data) return;
-    setDelBannerIds([]);
-    message.success("删除成功");
-    getBannerList();
-  };
   return (
     <div>
       <Card className="border-none" title="后台账号密码设置">
@@ -112,7 +84,7 @@ export default function SystemSetting() {
           <div>
             <Button
               type={"primary"}
-              onClick={() => showDeleteConfirm(delBannerIds)}
+              onClick={() => showDeleteConfirm(delDataIds)}
             >
               删除
             </Button>

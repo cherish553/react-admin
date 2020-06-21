@@ -22,7 +22,6 @@ export default function Category() {
     }
     router.push(obj);
   };
-  // const [goodList, setDataList] = useState<Array<GoodListData> | []>([]);
   const [rowSelection] = useState({
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       console.log(

@@ -1,69 +1,54 @@
 import React, { useState, useRef } from "react";
 import style from "./index.module.scss";
-// import classnames from "classnames";
-import { Card, Button, Table } from "antd";
+import { Button, Table } from "antd";
 import CategoryDialog from "./component/modal";
 import { Refs } from "./component/modal/declare";
-interface HomeList {
-  title: string;
-  count: number;
-}
+import { useTableHook, useDelData } from "@/hooks";
+import { getGoodsClassList, delGoodClass } from "@api/print";
+import { GoodClasslistData } from "@api/print/api";
 export default function UserList() {
+  const [dataList, pagination, , getDataList] = useTableHook<GoodClasslistData>(
+    getGoodsClassList
+  );
+  const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<
+    GoodClasslistData
+  >(delGoodClass, getDataList, "class_id");
   const Ref = useRef<Refs>();
-  const [serachForm, setSerachForm] = useState({
-    userName: "cherish",
-    phone: "15628771443",
-  });
-  const [id, setId] = useState<string | number>("");
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-    },
-  ]);
-  const [rowSelection] = useState({
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-    }),
-  });
-  const [userColumn, setuserColumn] = useState([
+  const [id, setId] = useState<number | undefined>();
+  const [userColumn] = useState([
     {
       title: "类目名称",
-      dataIndex: "userName",
+      dataIndex: "name",
     },
     {
       title: "操作",
       dataIndex: "",
-      render: (_: any, e: any) => (
+      render: (_: any, row: GoodClasslistData) => (
         <>
-          <Button size={"small"} onClick={() => showModal(1)}>
+          <Button size={"small"} onClick={() => showModal(row.class_id)}>
             编辑
           </Button>
-          <Button size={"small"} onClick={() => changes(e)}>
+          <Button
+            size={"small"}
+            onClick={() => showDeleteConfirm([row.class_id])}
+          >
             删除
           </Button>
         </>
       ),
     },
   ]);
-  const changes = (e: any): void => {
-    console.log(e);
-  };
-  const showModal = (id: string | number = "") => {
+  const showModal = (id?: number) => {
     setId(id);
     Ref.current?.SetVisible(true);
   };
   return (
     <div>
-      <Button className={style.mr20} type={"primary"}>
+      <Button
+        className={style.mr20}
+        type={"primary"}
+        onClick={() => showDeleteConfirm(delDataIds)}
+      >
         删除
       </Button>
       <Button type={"primary"} onClick={() => showModal()}>
@@ -71,15 +56,17 @@ export default function UserList() {
       </Button>
       <div>
         <Table
+          rowKey="class_id"
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
           }}
+          pagination={{ current: pagination.page, total: pagination.total }}
           columns={userColumn}
-          dataSource={userList}
+          dataSource={dataList}
         ></Table>
       </div>
-      <CategoryDialog id={id} ref={Ref} />
+      <CategoryDialog getDataList={getDataList} id={id} ref={Ref} />
     </div>
   );
 }

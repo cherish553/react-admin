@@ -13,6 +13,3 @@ export interface BannerDataDetail {
    updated_at: string
 }
 export type BannerDetail = Pick<BannerDataDetail, "img_url" | "jump_link" | "title"> & { sort: number | undefined | string }
-export interface BannerIds {
-   id: string
-}

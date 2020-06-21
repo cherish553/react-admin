@@ -3,3 +3,6 @@ interface CommonPagination<T> {
   total: number
   data: Array<T>
 }
+interface DelIds {
+  ids: string
+}
