@@ -22,3 +22,20 @@ export interface EditGoodClass {
    id?: number
    name: string
 }
+
+export interface GoodSpecDetail {
+   children_list: Array<GoodSpecDetailChildren>
+   code: string
+   created_at: string
+   id: number
+   name: string
+   status: number
+   updated_at: string
+}
+
+export interface GoodSpecDetailChildren {
+   id: number
+   children_id: number
+   name: string
+   edit: boolean
+}
