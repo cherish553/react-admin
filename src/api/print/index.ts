@@ -1,5 +1,5 @@
 import { get, post, del } from '@axios'
-import { GoodClasslistData, GoodListData, EditGoodClass, GoodSpecDetail } from './api'
+import { GoodClasslistData, GoodListData, EditGoodClass, GoodSpecDetail, EditGoodSpecParam } from './api'
 
 // 获取印品分类列表
 export const getGoodsClassList = ({ page }: { page: number }): Promise<CommonPagination<GoodClasslistData>> => get('admin/goodsClassList', { page })
@@ -20,4 +20,13 @@ export const delGoodClass = (data: DelIds): Promise<Boolean> => del<[]>('admin/d
 export const getGoodSpecList = (): Promise<Array<(GoodSpecDetail)> | []> => get<{ data: GoodSpecDetail[] }>(`admin/goodsSpecList`).then(res => {
     const data = res.data.map(item => ({ ...item, children_list: item.children_list.map(items => ({ ...items, children_id: items.id, id: item.id })) }))
     return data || []
-}) 
+})
+
+// 编辑印品规格
+export const postEditGoodSpec = (data: EditGoodSpecParam): Promise<[]> => post(`admin/editGoodsSpec`, data)
+
+// 添加印品规格
+export const postAddGoodSpec = ({ children_id, ...rest }: EditGoodSpecParam): Promise<[]> => post(`admin/editGoodsSpec`, { ...rest })
+
+// 删除印品规格
+export const delGoodSpec = (data: { id: string }): Promise<[]> => del(`admin/delGoodsSpec`, data)

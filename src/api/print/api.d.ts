@@ -37,5 +37,5 @@ export interface GoodSpecDetailChildren {
    id: number
    children_id: number
    name: string
-   edit: boolean
 }
+export type EditGoodSpecParam = Pick<GoodSpecDetailChildren, 'id' | 'name' | 'children_id'>
