@@ -1,17 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card, Input, Button, Table, Select, DatePicker } from "antd";
 import locale from "antd/es/date-picker/locale/zh_CN";
 import moment from "moment";
 import "moment/locale/zh-cn";
+import { useTableHook } from "@/hooks";
+import { getOrderList } from "@api/order";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-interface HomeList {
-  title: string;
-  count: number;
-}
 export default function UserList() {
+  const [serachForm, setSerachForm] = useState({
+    order_sn: "",
+    startTime: "",
+    endTime: "",
+  });
+  const [dataList, pagination, , getDataList] = useTableHook<any>(
+    getOrderList,
+    serachForm
+  );
   const status = [
     "待付款",
     "待发货",
@@ -21,69 +28,87 @@ export default function UserList() {
     "纠纷中",
     "交易成功",
   ];
-  const [serachForm, setSerachForm] = useState({
-    userName: "cherish",
-    phone: "15628771443",
-  });
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      lastLoginDate: "2020-6-5",
-      a: "2020-6-5",
-      b: "2020-6-5",
-    },
-  ]);
-  const [userColumn, setuserColumn] = useState([
+
+  const [dataColumn] = useState([
     {
       title: "订单号",
-      dataIndex: "userName",
+      dataIndex: "order_sn",
     },
     {
       title: "买家名称",
-      dataIndex: "phone",
+      dataIndex: "realname",
     },
-    {
-      title: "收货人信息",
-      dataIndex: "dealCount",
-    },
+    // {
+    //   title: "收货人信息",
+    //   dataIndex: "dealCount",
+    // },
     {
       title: "交易金额",
-      dataIndex: "lastLoginDate",
+      dataIndex: "pay_amount",
     },
     {
       title: "交易时间",
-      dataIndex: "a",
+      dataIndex: "pay_time",
     },
-    {
-      title: "订单状态",
-      dataIndex: "b",
-    },
+    // {
+    //   title: "订单状态",
+    //   dataIndex: "b",
+    // },
   ]);
   return (
     <div>
       <Card className={classnames(style.w100)}>
         <div>
-          <Select className={style.w200}>
+          <Select placeholder="所有状态" allowClear className={style.w200}>
             {status.map((item, index) => (
               <Option key={index} value={item}>
                 {item}
               </Option>
             ))}
           </Select>
-          <Input className={style.w200} />
+          <Input
+            allowClear
+            placeholder="交易订单号"
+            value={serachForm.order_sn}
+            onChange={(e) =>
+              setSerachForm({ ...serachForm, order_sn: e.target.value })
+            }
+            className={style.w200}
+          />
         </div>
         <div className={style.search}>
           <div>
             <p>交易时间</p>
             <RangePicker
+              value={[
+                serachForm.startTime ? moment(serachForm.startTime) : null,
+                serachForm.endTime ? moment(serachForm.endTime) : null,
+              ]}
+              onChange={(_, date) =>
+                setSerachForm({
+                  ...serachForm,
+                  startTime: date[0],
+                  endTime: date[1],
+                })
+              }
               locale={locale}
               placeholder={["开始时间", "结束时间"]}
             />
-            <Button type={"primary"}>确定</Button>
-            <Button type={"primary"}>重置</Button>
+            <Button onClick={() => getDataList()} type={"primary"}>
+              确定
+            </Button>
+            <Button
+              onClick={() =>
+                setSerachForm({
+                  startTime: "",
+                  endTime: "",
+                  order_sn: "",
+                })
+              }
+              type={"primary"}
+            >
+              重置
+            </Button>
           </div>
           <div>
             <Button type={"primary"}>导出</Button>
@@ -92,7 +117,12 @@ export default function UserList() {
         </div>
       </Card>
       <div>
-        <Table columns={userColumn} dataSource={userList}></Table>
+        <Table
+          rowKey="order_id"
+          pagination={{ current: pagination.page, total: pagination.total }}
+          columns={dataColumn}
+          dataSource={dataList}
+        ></Table>
       </div>
     </div>
   );

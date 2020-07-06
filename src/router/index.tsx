@@ -34,7 +34,7 @@ const { Content } = Layout;
 const BasicRoute = () => {
   return (
     <HashRouter>
-      <Switch>
+      
       <Route exact path="/login" component={login} />
         <Layout>
           <Layout>
@@ -50,6 +50,7 @@ const BasicRoute = () => {
                   minHeight: 280,
                 }}
               >
+                <Switch>
                 <Route exact path="/" component={home} />
                 <Route exact path="/userList" component={userList} />
                 <Route exact path="/template" component={template} />
@@ -81,12 +82,12 @@ const BasicRoute = () => {
                 />
                 <Route exact path="/systemSetting" component={systemSetting} />
                 <Route exact path="/editBanner" component={editBanner} />
+                </Switch>
               </Content>
             </Layout>
           </Layout>
         </Layout>
         ,
-      </Switch>
     </HashRouter>
   );
 };

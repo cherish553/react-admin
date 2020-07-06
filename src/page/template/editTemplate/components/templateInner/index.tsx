@@ -6,10 +6,16 @@ let now = ""; // 当前target（可拖拽元素）
 let dot = ""; // 当前dot（拉伸点）
 let scrollNode: Element;
 let fixTop = ""; // 想上拖拽时，之前的初始top值// const div = document.createElement('div')
+let fixLeft = ""; // 想上拖拽时，之前的初始top值// const div = document.createElement('div')
 interface DotFunc {
   rightTOP: Function;
   right: Function;
   rightBottom: Function;
+  top: Function;
+  bottom: Function;
+  left: Function;
+  leftBottom: Function;
+  leftTOP: Function;
 }
 interface NodeList {
   [propName: string]: StyleProp;
@@ -118,6 +124,51 @@ export default function TemplateInner() {
       }
       return width;
     },
+    changeTop: (e: MouseEvent, node: HTMLDivElement, nowData: StyleProp) => {
+      const offsetTop = canvas.current.offsetTop;
+      const maxHeihgt = +fixTop + +nowData.height.slice(0, -2);
+      let height =
+        +fixTop +
+        +nowData.height.slice(0, -2) -
+        (e.pageY + scrollNode.scrollTop - offsetTop);
+      let top = e.pageY + scrollNode.scrollTop - offsetTop;
+      if (height < 20) {
+        height = 20;
+        top = +fixTop + (+nowData.height.slice(0, -2) - 20);
+      } else if (height > maxHeihgt) {
+        height = maxHeihgt;
+        top = 0;
+      }
+      return { height, top };
+    },
+    changeLeft: (e: MouseEvent, node: HTMLDivElement, nowData: StyleProp) => {
+      const offsetLeft = canvas.current.offsetLeft;
+      const maxWidth = +fixLeft + +nowData.width.slice(0, -2);
+      let width =
+        +fixLeft +
+        +nowData.width.slice(0, -2) -
+        (e.pageX + scrollNode.scrollLeft - offsetLeft);
+      let left = e.pageX + scrollNode.scrollLeft - offsetLeft;
+      if (width < 20) {
+        width = 20;
+        left = +fixLeft + (+nowData.width.slice(0, -2) - 20);
+      } else if (width > maxWidth) {
+        width = maxWidth;
+        left = 0;
+      }
+      return { width, left };
+    },
+    changeBottom: (e: MouseEvent, node: HTMLDivElement, nowData: StyleProp) => {
+      const top = canvas.current.offsetTop;
+      const maxHeight = parent.height - +nowData.top.slice(0, -2);
+      let height = e.pageY + scrollNode.scrollTop - top - node.offsetTop;
+      if (height < 20) {
+        height = 20;
+      } else if (height > maxHeight) {
+        height = maxHeight;
+      }
+      return height;
+    },
   };
   const onChange = (e: any) => {
     // console.log("radio checked", e.target.value);
@@ -129,26 +180,18 @@ export default function TemplateInner() {
     window.removeEventListener("mousemove", changeRrightTop);
     window.removeEventListener("mousemove", changeRight);
     window.removeEventListener("mousemove", changeRightBottom);
+    window.removeEventListener("mousemove", changeTop);
+    window.removeEventListener("mousemove", changeBottom);
+    window.removeEventListener("mousemove", changeLeft);
+    window.removeEventListener("mousemove", changeLeftBottom);
+    window.removeEventListener("mousemove", changeLeftTOP);
   };
 
   const changeRrightTop = (e: MouseEvent) => {
     const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
     const nowData = nodeList[now];
     const width = computed.changeRight(e, node, nowData);
-    const offsetTop = canvas.current.offsetTop;
-    const maxHeihgt = +fixTop + +nowData.height.slice(0, -2);
-    let height =
-      +fixTop +
-      +nowData.height.slice(0, -2) -
-      (e.pageY + scrollNode.scrollTop - offsetTop);
-    let top = e.pageY + scrollNode.scrollTop - offsetTop;
-    if (height < 20) {
-      height = 20;
-      top = +fixTop + (+nowData.height.slice(0, -2) - 20);
-    } else if (height > maxHeihgt) {
-      height = maxHeihgt;
-      top = 0;
-    }
+    const { height, top } = computed.changeTop(e, node, nowData);
     setNodeList({
       ...nodeList,
       [now]: {
@@ -172,32 +215,87 @@ export default function TemplateInner() {
       },
     });
   };
-
+  const changeLeft = (e: MouseEvent) => {
+    const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
+    const nowData = nodeList[now];
+    const { width, left } = computed.changeLeft(e, node, nowData);
+    setNodeList({
+      ...nodeList,
+      [now]: {
+        ...nowData,
+        left: `${left}px`,
+        width: `${width}px`,
+      },
+    });
+  };
   const changeRightBottom = (e: MouseEvent) => {
     const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
     const nowData = nodeList[now];
     const width = computed.changeRight(e, node, nowData);
-    // const left = canvas.current.offsetLeft;
-    const top = canvas.current.offsetTop;
-    // const maxWidth = parent.width - +nowData.left.slice(0, -2);
-    const maxHeight = parent.height - +nowData.top.slice(0, -2);
-    // let width = e.pageX - left - node.offsetLeft;
-    let height = e.pageY + scrollNode.scrollTop - top - node.offsetTop;
-    // if (width < 20) {
-    //   width = 20;
-    // } else if (width > maxWidth) {
-    //   width = maxWidth;
-    // }
-    if (height < 20) {
-      height = 20;
-    } else if (height > maxHeight) {
-      height = maxHeight;
-    }
+    const height = computed.changeBottom(e, node, nowData);
+
     setNodeList({
       ...nodeList,
       [now]: {
         ...nowData,
         width: `${width}px`,
+        height: `${height}px`,
+      },
+    });
+  };
+  const changeTop = (e: MouseEvent) => {
+    const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
+    const nowData = nodeList[now];
+    const { height, top } = computed.changeTop(e, node, nowData);
+    setNodeList({
+      ...nodeList,
+      [now]: {
+        ...nowData,
+        top: `${top}px`,
+        height: `${height}px`,
+      },
+    });
+  };
+  const changeBottom = (e: MouseEvent) => {
+    const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
+    const nowData = nodeList[now];
+    const height = computed.changeBottom(e, node, nowData);
+
+    setNodeList({
+      ...nodeList,
+      [now]: {
+        ...nowData,
+        height: `${height}px`,
+      },
+    });
+  };
+  const changeLeftBottom = (e: MouseEvent) => {
+    const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
+    const nowData = nodeList[now];
+    const { width, left } = computed.changeLeft(e, node, nowData);
+    const height = computed.changeBottom(e, node, nowData);
+    setNodeList({
+      ...nodeList,
+      [now]: {
+        ...nowData,
+        left: `${left}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+      },
+    });
+  };
+  const changeLeftTOP = (e: MouseEvent) => {
+    const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
+    const nowData = nodeList[now];
+    const { width, left } = computed.changeLeft(e, node, nowData);
+    const { height, top } = computed.changeTop(e, node, nowData);
+    setNodeList({
+      ...nodeList,
+      [now]: {
+        ...nowData,
+        top: `${top}px`,
+        width: `${width}px`,
+        left: `${left}px`,
         height: `${height}px`,
       },
     });
@@ -208,12 +306,37 @@ export default function TemplateInner() {
       window.addEventListener("mousemove", changeRrightTop);
       window.addEventListener("mouseup", onMouseUp);
     },
-    right: (now: string) => {
+    right: () => {
       window.addEventListener("mousemove", changeRight);
       window.addEventListener("mouseup", onMouseUp);
     },
-    rightBottom: (now: string) => {
+    rightBottom: () => {
       window.addEventListener("mousemove", changeRightBottom);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    top: (now: string) => {
+      fixTop = nodeList[now].top.slice(0, -2);
+      window.addEventListener("mousemove", changeTop);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    bottom: () => {
+      window.addEventListener("mousemove", changeBottom);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    left: (now: string) => {
+      fixLeft = nodeList[now].left.slice(0, -2);
+      window.addEventListener("mousemove", changeLeft);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    leftBottom: (now: string) => {
+      fixLeft = nodeList[now].left.slice(0, -2);
+      window.addEventListener("mousemove", changeLeftBottom);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    leftTOP: (now: string) => {
+      fixLeft = nodeList[now].left.slice(0, -2);
+      fixTop = nodeList[now].top.slice(0, -2);
+      window.addEventListener("mousemove", changeLeftTOP);
       window.addEventListener("mouseup", onMouseUp);
     },
   };
@@ -237,55 +360,67 @@ export default function TemplateInner() {
         onMouseDown={onMouseDown}
         className={style.canvas}
       >
-        <div
-          key={"main1"}
-          data-type="main1"
-          className={classnames(style.abs, "main1")}
-          style={nodeList["main1"]}
-        >
-          {target === "main1"
-            ? [
-                <span
-                  data-type="main1"
-                  data-dot="right"
-                  key={Math.random()}
-                  className={classnames(style.circle, style.right)}
-                ></span>,
-                <span
-                  key={Math.random()}
-                  className={classnames(style.circle, style.left)}
-                ></span>,
-                <span
-                  key={Math.random()}
-                  className={classnames(style.circle, style.top)}
-                ></span>,
-                <span
-                  key={Math.random()}
-                  className={classnames(style.circle, style.bottom)}
-                ></span>,
-                <span
-                  data-type="main1"
-                  data-dot="rightTOP"
-                  key={Math.random()}
-                  className={classnames(style.circle, style.rightTOP)}
-                ></span>,
-                <span
-                  key={Math.random()}
-                  className={classnames(style.circle, style.leftTOP)}
-                ></span>,
-                <span
-                  data-type="main1"
-                  data-dot="rightBottom"
-                  key={Math.random()}
-                  className={classnames(style.circle, style.rightBottom)}
-                ></span>,
-                <span
-                  key={Math.random()}
-                  className={classnames(style.circle, style.leftBottom)}
-                ></span>,
-              ]
-            : ""}
-        </div>
+        {Object.entries(nodeList).map((item) => (
+          <div
+            key={item[0]}
+            data-type={item[0]}
+            className={classnames(style.abs, item[0])}
+            style={nodeList[item[0]]}
+          >
+            {target === item[0]
+              ? [
+                  <span
+                    data-type={item[0]}
+                    data-dot="right"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.right)}
+                  ></span>,
+                  <span
+                    data-type={item[0]}
+                    data-dot="left"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.left)}
+                  ></span>,
+                  <span
+                    data-type={item[0]}
+                    data-dot="top"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.top)}
+                  ></span>,
+                  <span
+                    data-type={item[0]}
+                    data-dot="bottom"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.bottom)}
+                  ></span>,
+                  <span
+                    data-type={item[0]}
+                    data-dot="rightTOP"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.rightTOP)}
+                  ></span>,
+                  <span
+                    data-type={item[0]}
+                    data-dot="leftTOP"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.leftTOP)}
+                  ></span>,
+                  <span
+                    data-type={item[0]}
+                    data-dot="rightBottom"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.rightBottom)}
+                  ></span>,
+                  <span
+                    data-type={item[0]}
+                    data-dot="leftBottom"
+                    key={Math.random()}
+                    className={classnames(style.circle, style.leftBottom)}
+                  ></span>,
+                ]
+              : ""}
+          </div>
+        ))}
         {/* <div
           key={"main2"}
           data-type="main2"
