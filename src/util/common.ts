@@ -31,3 +31,14 @@ export function filter<T extends {}, K extends keyof T>(data: T) {
         }, obj)
     return obj
 }
+// search转换为对象
+export function query<T>(str: string): T | {} {
+    if (!str.length) return {}
+    const arr = str.split('?')
+    arr.shift()
+    return arr.reduce((pre: { [propName: string]: any }, now) => {
+        const data = now.split('=')
+        pre[data[0]] = data[1]
+        return pre
+    }, {})
+}

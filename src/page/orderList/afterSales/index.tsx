@@ -4,15 +4,18 @@ import { useHistory } from "react-router-dom";
 import classnames from "classnames";
 import { Card, Input, Button, Table, Select, DatePicker } from "antd";
 import locale from "antd/es/date-picker/locale/zh_CN";
+import { getAfterSaleList } from "@api/afterSaler";
+import { AfterSaleListData } from "@api/afterSaler/api";
+
+import { useTableHook } from "@/hooks";
 import "moment/locale/zh-cn";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-interface HomeList {
-  title: string;
-  count: number;
-}
 export default function AfterSales() {
   let router = useHistory();
+  const [dataList, pagination, , getDataList] = useTableHook<any>(
+    getAfterSaleList
+  );
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
@@ -42,22 +45,22 @@ export default function AfterSales() {
       name: record.name,
     }),
   });
-  const [userColumn, setuserColumn] = useState([
+  const [dataColumn] = useState([
     {
       title: "订单号",
-      dataIndex: "userName",
+      dataIndex: ['order_info','order_sn'],
     },
     {
       title: "买家名称",
-      dataIndex: "phone",
+      dataIndex: "user_name",
     },
     {
       title: "收货人信息",
-      dataIndex: "a",
+      dataIndex: "info",
     },
     {
       title: "交易金额",
-      dataIndex: "lastLoginDate",
+      dataIndex: ['order_info','pay_amount'],
     },
     {
       title: "交易时间",
@@ -65,13 +68,16 @@ export default function AfterSales() {
     },
     {
       title: "工单状态",
-      dataIndex: "c",
+      dataIndex: "status",
     },
     {
       title: "操作",
       dataIndex: "",
-      render: (_: any, e: any) => (
-        <Button size={"small"} onClick={() => jumpToPage("/afterSalesDetail", 4)}>
+      render: (_: any, row: AfterSaleListData) => (
+        <Button
+          size={"small"}
+          onClick={() => jumpToPage("/afterSalesDetail", row.id)}
+        >
           查看详情
         </Button>
       ),
@@ -109,12 +115,13 @@ export default function AfterSales() {
       </Card>
       <div>
         <Table
+          rowKey="id"
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
           }}
-          columns={userColumn}
-          dataSource={userList}
+          columns={dataColumn}
+          dataSource={dataList}
         ></Table>
       </div>
     </div>

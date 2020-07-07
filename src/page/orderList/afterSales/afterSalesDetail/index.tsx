@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Form, Input, Button, Rate } from "antd";
 import style from "./index.module.scss";
-export default function AfterSalesDetail() {
+import { withRouter, RouteComponentProps } from "react-router-dom";
+import { query } from "@/util/common";
+import { getAfterSaleDetail as GetAfterSaleDetail } from "@api/afterSaler";
+function judgeSearch(queryData: {} | Id): queryData is Id {
+  return !!(queryData as Id).id;
+}
+function AfterSalesDetail(props: RouteComponentProps) {
+  const [id, setId] = useState<string | number>(0);
+  useEffect(() => {
+    const queryData = query<Id>(props.location.search);
+    if (judgeSearch(queryData)) {
+      setId(id);
+      getAfterSaleDetail(queryData.id);
+    }
+  }, []);
+  const getAfterSaleDetail = async (id: number) => {
+    const data = await GetAfterSaleDetail({ id });
+    console.log(data);
+  };
   return (
     <div>
       <div className={style.top}>
@@ -17,7 +35,9 @@ export default function AfterSalesDetail() {
         </Form>
       </div>
       <Form name="basic" initialValues={{ remember: true }}>
-      <Form.Item label="申请售后原因">申请售后原因申请售后原因申请售后原因申请售后原因</Form.Item>
+        <Form.Item label="申请售后原因">
+          申请售后原因申请售后原因申请售后原因申请售后原因
+        </Form.Item>
         <Form.Item label="凭证">凭证图片</Form.Item>
         <Form.Item label="处理意见">
           <Input.TextArea></Input.TextArea>
@@ -27,3 +47,4 @@ export default function AfterSalesDetail() {
     </div>
   );
 }
+export default withRouter(AfterSalesDetail);

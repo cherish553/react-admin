@@ -2,17 +2,27 @@ import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card, Input, Button, Table } from "antd";
-import {useHistory} from 'react-router-dom'
+import { useHistory } from "react-router-dom";
+import { getTemplateList, delTemplateList } from "@api/template";
+import { useTableHook, useDelData } from "@/hooks";
 interface HomeList {
   title: string;
   count: number;
 }
 export default function UserList() {
   let router = useHistory();
+  const [dataList, pagination, , getDataList] = useTableHook<any>(
+    getTemplateList
+  );
+  const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<any>(
+    delTemplateList,
+    getDataList,
+    "type_id"
+  );
   const jumpToPage = (url: string, id?: number) => {
     router.push({
       pathname: url,
-      search: id?`?id=${id}`:'',
+      search: id ? `?id=${id}` : "",
     });
   };
   const [serachForm, setSerachForm] = useState({
@@ -28,19 +38,6 @@ export default function UserList() {
       lastLoginDate: "2020-6-5",
     },
   ]);
-  const [rowSelection] = useState({
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-    }),
-  });
   const [userColumn, setuserColumn] = useState([
     {
       title: "模板名称",
@@ -76,20 +73,27 @@ export default function UserList() {
     <div>
       <Card>
         <div className={style.search}>
-          <Button className={style.mr20} type={"primary"}>
+          <Button
+            className={style.mr20}
+            type={"primary"}
+            onClick={() => showDeleteConfirm(delDataIds)}
+          >
             删除
           </Button>
-          <Button type={"primary"} onClick={()=>jumpToPage('/editTemplate')}>新增</Button>
+          <Button type={"primary"} onClick={() => jumpToPage("/editTemplate")}>
+            新增
+          </Button>
         </div>
       </Card>
       <div>
         <Table
+          pagination={{ current: pagination.page, total: pagination.total }}
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
           }}
           columns={userColumn}
-          dataSource={userList}
+          dataSource={dataList}
         ></Table>
       </div>
     </div>

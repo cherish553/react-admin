@@ -8,6 +8,12 @@ export interface OrderDetail {
    pay_time: string
    realname: string
 }
+export interface OrderParams {
+   order_sn: string
+   startTime: string
+   endTime: string
+   page: number
+}
 // export interface AddCoupon{
 
 // }
