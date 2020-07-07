@@ -191,25 +191,7 @@ export default function TemplateInner() {
     const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
     const nowData = nodeList[now];
     const width = computed.changeRight(e, node, nowData);
-<<<<<<< HEAD
-    const offsetTop = canvas.current.offsetTop;
-    const maxHeihgt = +fixTop + +nowData.height.slice(0, -2);
-    let height =
-      +fixTop +
-      +nowData.height.slice(0, -2) -
-      (e.pageY + scrollNode.scrollTop - offsetTop);
-    let top = e.pageY + scrollNode.scrollTop - offsetTop;
-    // 处理最大和最小
-    if (height < 20) {
-      height = 20;
-      top = +fixTop + (+nowData.height.slice(0, -2) - 20);
-    } else if (height > maxHeihgt) {
-      height = maxHeihgt;
-      top = 0;
-    }
-=======
     const { height, top } = computed.changeTop(e, node, nowData);
->>>>>>> 2ac5e82dea8243518c3bc5f0b1c2755dfcb3ea2f
     setNodeList({
       ...nodeList,
       [now]: {
