@@ -24,16 +24,14 @@ const SpecDialog = (props: Props, ref: any) => {
     children_id: 0,
   });
   useEffect(() => {
+    if (!row) return;
     if (row?.children_id) {
       SetTitle("编辑属性");
-      form.setFieldsValue(row);
-      setFormData(row);
-      return;
     } else if (row?.children_id === 0) {
-      setFormData(row);
-      form.setFieldsValue(row);
       SetTitle("添加属性");
     }
+    setFormData(row);
+    form.setFieldsValue(row);
   }, [row]);
   useImperativeHandle(
     ref,

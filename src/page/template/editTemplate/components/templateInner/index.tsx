@@ -5,7 +5,7 @@ import { Form, Radio, Button } from "antd";
 let now = ""; // 当前target（可拖拽元素）
 let dot = ""; // 当前dot（拉伸点）
 let scrollNode: Element;
-let fixTop = ""; // 想上拖拽时，之前的初始top值// const div = document.createElement('div')
+let fixTop = ""; // 向上拖拽时，之前的初始top值// const div = document.createElement('div')
 interface DotFunc {
   rightTOP: Function;
   right: Function;
@@ -142,6 +142,7 @@ export default function TemplateInner() {
       +nowData.height.slice(0, -2) -
       (e.pageY + scrollNode.scrollTop - offsetTop);
     let top = e.pageY + scrollNode.scrollTop - offsetTop;
+    // 处理最大和最小
     if (height < 20) {
       height = 20;
       top = +fixTop + (+nowData.height.slice(0, -2) - 20);
@@ -206,7 +207,7 @@ export default function TemplateInner() {
     rightTOP: (now: string) => {
       fixTop = nodeList[now].top.slice(0, -2);
       window.addEventListener("mousemove", changeRrightTop);
-      window.addEventListener("mouseup", onMouseUp);
+      window.addEventListener("mouseup", onMouseUp); // 移除事件
     },
     right: (now: string) => {
       window.addEventListener("mousemove", changeRight);
