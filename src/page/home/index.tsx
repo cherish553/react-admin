@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 // import { getAdminLogin as GetAdminLogin } from "@api/index";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card } from "antd";
+import { getIndex as GetIndex } from "@api/home";
 interface HomeList {
   title: string;
   count: number;
@@ -11,34 +12,30 @@ interface HomeList {
 export default function Home(aa: any) {
   // const router = useHistory();
   useEffect(() => {
-    // getAdminLogin();
-    // console.log(router)
-    // console.log(a)
-    // Update the document title using the browser API
-    // document.title = `You clicked ${count} times`;
+    getIndex();
   }, []);
-  // const getAdminLogin = async () => {
-  //   console.log(process.env);
-  //   const data = await GetAdminLogin({
-  //     mobile: "13687607337",
-  //     password: "11111111",
-  //   });
-  //   console.log(data);
-  // };
-  const [homeList, setList] = useState([
+
+  async function getIndex() {
+    const { totalUser, totalMoney } = await GetIndex();
+    setHomeList([
+      { ...homeList[0], count: totalUser },
+      { ...homeList[0], count: totalMoney },
+    ]);
+  }
+  const [homeList, setHomeList] = useState([
     {
       title: "用户数",
-      count: 10000,
+      count: 0,
     },
     {
       title: "昨日收益",
-      count: 20000,
+      count: 0,
     },
   ]);
   return (
     <div className={style.cardlLyout}>
-      {homeList.map((item: HomeList) => (
-        <Card className={style.mr25} key={item.title} style={{ width: 200 }}>
+      {homeList.map((item: HomeList,index) => (
+        <Card className={style.mr25} key={index} style={{ width: 200 }}>
           <div className={classnames(style.textRight, style.card)}>
             <div className={style.width50}></div>
             <div className={style.width50}>

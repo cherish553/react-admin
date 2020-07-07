@@ -11,7 +11,7 @@ export default function Coupon() {
   const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<
     CouponDetail
   >(delCoupon, getDataList, "type_id");
-  const [userColumn] = useState([
+  const [dataColumn] = useState([
     {
       title: "交易券",
       dataIndex: "type_name",
@@ -56,7 +56,7 @@ export default function Coupon() {
             type: "checkbox",
             ...rowSelection,
           }}
-          columns={userColumn}
+          columns={dataColumn}
           dataSource={dataList}
         ></Table>
       </div>

@@ -6,3 +6,6 @@ interface CommonPagination<T> {
 interface DelIds {
   ids: string
 }
+interface Id {
+  id: number
+}
