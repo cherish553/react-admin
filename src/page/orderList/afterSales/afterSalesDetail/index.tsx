@@ -5,11 +5,15 @@ import style from "./index.module.scss";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import { query } from "@/util/common";
 import { getAfterSaleDetail as GetAfterSaleDetail } from "@api/afterSaler";
+import { AfterSaleDetailData } from "@api/afterSaler/api";
 function judgeSearch(queryData: {} | Id): queryData is Id {
   return !!(queryData as Id).id;
 }
 function AfterSalesDetail(props: RouteComponentProps) {
   const [id, setId] = useState<string | number>(0);
+  const [afterSaleDetail, setAfterSaleDetail] = useState<AfterSaleDetailData>(
+    {} as AfterSaleDetailData
+  );
   useEffect(() => {
     const queryData = query<Id>(props.location.search);
     if (judgeSearch(queryData)) {
@@ -19,7 +23,7 @@ function AfterSalesDetail(props: RouteComponentProps) {
   }, []);
   const getAfterSaleDetail = async (id: number) => {
     const data = await GetAfterSaleDetail({ id });
-    console.log(data);
+    setAfterSaleDetail(data);
   };
   return (
     <div>
@@ -29,16 +33,22 @@ function AfterSalesDetail(props: RouteComponentProps) {
           <div>aaaaaaa</div>
         </div>
         <Form name="basic" initialValues={{ remember: true }}>
-          <Form.Item label="订单号">123123123</Form.Item>
-          <Form.Item label="交易时间">123123123</Form.Item>
-          <Form.Item label="买家名称">123123123</Form.Item>
+          <Form.Item label="订单号">
+            {afterSaleDetail?.order_info?.order_sn}
+          </Form.Item>
+          <Form.Item label="交易时间">
+            {afterSaleDetail?.order_info?.pay_time}
+          </Form.Item>
+          <Form.Item label="买家名称">
+            {afterSaleDetail?.order_info?.realname}
+          </Form.Item>
         </Form>
       </div>
       <Form name="basic" initialValues={{ remember: true }}>
-        <Form.Item label="申请售后原因">
-          申请售后原因申请售后原因申请售后原因申请售后原因
+        <Form.Item label="申请售后原因">{afterSaleDetail?.info}</Form.Item>
+        <Form.Item label="凭证">
+          <img src={afterSaleDetail?.img} alt="" />
         </Form.Item>
-        <Form.Item label="凭证">凭证图片</Form.Item>
         <Form.Item label="处理意见">
           <Input.TextArea></Input.TextArea>
         </Form.Item>

@@ -74,3 +74,18 @@ export interface OrderDetail {
    updated_at: string
    user_id: number
 }
+export interface AfterSaleDetailData {
+   order_goods: Array<OrderGoods>
+   order_info: OrderInfo
+   reply: string
+   info: string
+   img: string
+}
+interface OrderGoods {
+   index_img: string
+}
+interface OrderInfo {
+   realname: string
+   pay_time: string
+   order_sn: string
+}
