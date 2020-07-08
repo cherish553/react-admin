@@ -72,6 +72,9 @@ const Siders = (props: RouteComponentProps) => {
           <Menu.Item key="17" onClick={() => jumpToPage("/newUserCoupon")}>
             新用户优惠券
           </Menu.Item>
+          <Menu.Item key="23" onClick={() => jumpToPage("/sendCoupon")}>
+            发放优惠券
+          </Menu.Item>
         </SubMenu>
         <Menu.Item key="18" onClick={() => jumpToPage("/showWorks")}>
           作品管理

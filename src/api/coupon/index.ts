@@ -21,3 +21,6 @@ export const getNewUserActive = (): Promise<NewUserDetail> => get<Array<{ value:
 
 // 新用户优惠券活动设置接口
 export const postAddNewUserActive = (data: NewUserDetail): Promise<[]> => post('admin/addNewUserActivity', data)
+
+// 获取可发放红包活动列表
+export const getSendCouponList = (data: any) => get(`admin/sendCouponList`, data)

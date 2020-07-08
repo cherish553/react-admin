@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 import { Button, Table } from "antd";
 import { useTableHook, useDelData } from "@/hooks";
-import { getCouponList, delCoupon } from "@api/coupon";
+import { getSendCouponList } from "@api/coupon";
 import { CouponDetail } from "@api/coupon/api";
-export default function Coupon() {
+export default function SendCoupon() {
   const [dataList, pagination, , getDataList] = useTableHook<CouponDetail>(
-    getCouponList
+    getSendCouponList
   );
-  const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<
-    CouponDetail
-  >(delCoupon, getDataList, "type_id");
+  // const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<
+  //   CouponDetail
+  // >(delCoupon, getDataList, "type_id");
   const [dataColumn] = useState([
     {
       title: "交易券",
@@ -27,17 +27,19 @@ export default function Coupon() {
     },
     {
       title: "添加时间",
-      dataIndex: "created_time",
+      dataIndex: "created_at",
     },
     {
       title: "是否定向发送",
-      dataIndex: "created_time",
+      dataIndex: "type",
     },
     {
       title: "操作",
       dataIndex: "",
       render: (_: any, row: CouponDetail) => (
-        <Button size={"small"} onClick={() => showDeleteConfirm([row.type_id])}>
+        <Button size={"small"} 
+        // onClick={() => showDeleteConfirm([row.type_id])}
+        >
           删除
         </Button>
       ),
@@ -49,16 +51,23 @@ export default function Coupon() {
         <Button
           className={style.mr20}
           type={"primary"}
-          onClick={() => showDeleteConfirm(delDataIds)}
+          // onClick={() => showDeleteConfirm(delDataIds)}
         >
           删除
+        </Button>
+        <Button
+          className={style.mr20}
+          type={"primary"}
+          // onClick={() => showDeleteConfirm(delDataIds)}
+        >
+          添加
         </Button>
         <Table
           rowKey="type_id"
           pagination={{ current: pagination.page, total: pagination.total }}
           rowSelection={{
             type: "checkbox",
-            ...rowSelection,
+            // ...rowSelection,
           }}
           columns={dataColumn}
           dataSource={dataList}
