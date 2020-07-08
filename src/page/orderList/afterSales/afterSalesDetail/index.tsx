@@ -28,10 +28,13 @@ function AfterSalesDetail(props: RouteComponentProps) {
   return (
     <div>
       <div className={style.top}>
-        <div className={style.flex}>
-          <div>图片</div>
-          <div>aaaaaaa</div>
-        </div>
+        {afterSaleDetail?.order_goods?.map((item) => (
+          <div key={item.id} className={style.flex}>
+            <div>{item.index_img}</div>
+            <div>{item.goos_name}</div>
+          </div>
+        ))}
+
         <Form name="basic" initialValues={{ remember: true }}>
           <Form.Item label="订单号">
             {afterSaleDetail?.order_info?.order_sn}

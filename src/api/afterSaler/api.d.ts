@@ -83,6 +83,9 @@ export interface AfterSaleDetailData {
 }
 interface OrderGoods {
    index_img: string
+   id: string
+   goos_name: string
+
 }
 interface OrderInfo {
    realname: string

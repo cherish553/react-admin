@@ -1,6 +1,6 @@
 @import '@/style/index.scss';
 .top{
-    @include flex;
+    // @include flex;
     .flex{
         @include flex(flex-start);
     }
