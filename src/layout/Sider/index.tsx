@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Menu } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import { useHistory } from "react-router-dom";
-
+import { useHistory, withRouter, RouteComponentProps } from "react-router-dom";
+import { routerObj } from "@/util/router";
 const { SubMenu } = Menu;
 const { Sider } = Layout;
-const Siders = () => {
+const Siders = (props: RouteComponentProps) => {
   let router = useHistory();
+  useEffect(() => {
+    const search = !!props.location.search ? "Search" : "";
+    const data = `${props.location.pathname}${search}`;
+    setSelectSub([routerObj[data].key]);
+  }, [props.location]);
   const [selectSub, setSelectSub] = useState(["sub1"]);
   const jumpToPage = (url: string) => {
     router.push(url);
@@ -14,6 +19,7 @@ const Siders = () => {
   return (
     <Sider width={200} className="site-layout-background">
       <Menu
+        selectedKeys={selectSub}
         // openKeys={["1"]}
         // selectedKeys={selectSub}
         mode="inline"
@@ -71,13 +77,21 @@ const Siders = () => {
           作品管理
         </Menu.Item>
         <SubMenu key="sub5" icon={<UserOutlined />} title="分佣管理">
-          <Menu.Item key="19" onClick={() => jumpToPage("/commission")}>分佣管理</Menu.Item>
-          <Menu.Item key="20" onClick={() => jumpToPage("/withdrawalLog")}>提现申请记录</Menu.Item>
+          <Menu.Item key="19" onClick={() => jumpToPage("/commission")}>
+            分佣管理
+          </Menu.Item>
+          <Menu.Item key="20" onClick={() => jumpToPage("/withdrawalLog")}>
+            提现申请记录
+          </Menu.Item>
         </SubMenu>
-        <Menu.Item key="21" onClick={() => jumpToPage("/dataStatistics")}>数据统计</Menu.Item>
-        <Menu.Item key="22" onClick={() => jumpToPage("/systemSetting")}>系统设置</Menu.Item>
+        <Menu.Item key="21" onClick={() => jumpToPage("/dataStatistics")}>
+          数据统计
+        </Menu.Item>
+        <Menu.Item key="22" onClick={() => jumpToPage("/systemSetting")}>
+          系统设置
+        </Menu.Item>
       </Menu>
     </Sider>
   );
 };
-export default Siders;
+export default withRouter(Siders);

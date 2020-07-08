@@ -10,7 +10,7 @@ function Top(props: any) {
     const search = props.location.search?'Search':'';
     
     console.log(props.location)
-    setTitle(routerObj[`${pathname}${search}`]);
+    setTitle(routerObj[`${pathname}${search}`].title);
   }, [props, props.location.pathname]);
   return (
     <Header className="header">
