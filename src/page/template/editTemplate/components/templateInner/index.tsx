@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Form, Radio, Button } from "antd";
+import { GoodsModel } from "@api/template/api";
 let now = ""; // 当前target（可拖拽元素）
 let dot = ""; // 当前dot（拉伸点）
 let type = ""; // 当前type（决定是否是文字位或图片位）
@@ -51,9 +52,24 @@ let textIndex = 0;
 const pageList: Array<{
   imageList: imageList;
   textList: textList;
-}> = [];
-export default function TemplateInner() {
+}> = [
+  {
+    imageList: {},
+    textList: {},
+  },
+];
+interface Props {
+  data: {
+    formData: GoodsModel;
+    setFormData: React.Dispatch<React.SetStateAction<GoodsModel>>;
+  };
+}
+export default function TemplateInner(props: Props) {
   const canvas = useRef<Canvas>() as React.MutableRefObject<Canvas>;
+  const {
+    data: { formData },
+  } = props;
+  const pagination = parseInt(formData.numberPages);
   const [checked, setChecked] = useState(0);
   const [target, setTarget] = useState("");
   const [parent, setParent] = useState({
@@ -77,7 +93,6 @@ export default function TemplateInner() {
   useEffect(() => {
     console.log(pageList);
   }, [checked]);
-  const [pagination] = useState(5);
   const [imageList, setImageList] = useState<imageList>({});
   const [textList, setTextList] = useState<textList>({});
   const drag = (e: MouseEvent) => {
@@ -428,6 +443,9 @@ export default function TemplateInner() {
     window.addEventListener("mousemove", drag);
     window.addEventListener("mouseup", onMouseUp);
   };
+  const clearCanvas = () => {
+    console.log(pageList[checked]);
+  };
   function deletePlaceholder(list: string, key: string) {
     let newList;
     if (list === "textList") {
@@ -528,8 +546,8 @@ export default function TemplateInner() {
             onChange={(e) => {
               pageList[checked] = { imageList, textList };
               setChecked(e.target.value);
-              setImageList(pageList[e.target.value]?.imageList||{});
-              setTextList(pageList[e.target.value]?.textList||{});
+              setImageList(pageList[e.target.value]?.imageList || {});
+              setTextList(pageList[e.target.value]?.textList || {});
             }}
           >
             <Radio value={0} key={0}>
@@ -579,7 +597,7 @@ export default function TemplateInner() {
           >
             添加图片位
           </Button>
-          <Button>清空画板</Button>
+          <Button onClick={clearCanvas}>清空画板</Button>
           <Button>保存画板</Button>
         </Form.Item>
       </Form>

@@ -9,3 +9,9 @@ export interface UserData {
    mobile: string
    name: string
 }
+export interface GoodsModel{
+   name:string
+   size:string
+   numberPages:string
+   pageList:any
+}
