@@ -36,6 +36,8 @@ interface StyleImageProp {
 interface StyleTextProp {
   height: string;
   top: string;
+  lineHeight: string;
+  fontSize: string;
 }
 
 interface Canvas {
@@ -46,9 +48,13 @@ interface Canvas {
 }
 let imageIndex = 0;
 let textIndex = 0;
+const pageList: Array<{
+  imageList: imageList;
+  textList: textList;
+}> = [];
 export default function TemplateInner() {
   const canvas = useRef<Canvas>() as React.MutableRefObject<Canvas>;
-  const [checked, setChecked] = useState(1);
+  const [checked, setChecked] = useState(0);
   const [target, setTarget] = useState("");
   const [parent, setParent] = useState({
     width: 0,
@@ -67,6 +73,11 @@ export default function TemplateInner() {
       top: canvas.current.offsetTop,
     });
   }, [canvas, target]);
+
+  useEffect(() => {
+    console.log(pageList);
+  }, [checked]);
+  const [pagination] = useState(5);
   const [imageList, setImageList] = useState<imageList>({});
   const [textList, setTextList] = useState<textList>({});
   const drag = (e: MouseEvent) => {
@@ -80,7 +91,7 @@ export default function TemplateInner() {
       height = +imageList[now].height.slice(0, -2);
       nowData = imageList[now];
     } else {
-      width = 200;
+      width = 100;
       height = +textList[now].height.slice(0, -2);
       nowData = textList[now];
     }
@@ -118,7 +129,7 @@ export default function TemplateInner() {
       setTextList({
         ...textList,
         [now]: {
-          ...nowData,
+          ...(nowData as StyleTextProp),
           left: `${left}px`,
           top: `${top}px`,
         } as StyleTextProp,
@@ -201,6 +212,7 @@ export default function TemplateInner() {
     },
   };
   const onChange = (e: any) => {
+    console.log(e);
     // console.log("radio checked", e.target.value);
     // setChecked(e.target.value);
     // console.log(e)
@@ -295,13 +307,14 @@ export default function TemplateInner() {
             ...nowData,
             top: `${top}px`,
             height: `${height}px`,
+            fontSize: `${height}px`,
+            lineHeight: `${height}px`,
           },
         });
       }
     },
     changeBottom: (e: MouseEvent) => {
       const node = document.querySelector<HTMLDivElement>(`.${now}`)!;
-      console.log(node);
       if (type === "imageList") {
         const nowData = imageList[now];
         const height = computed.changeBottom(e, node, nowData);
@@ -320,6 +333,8 @@ export default function TemplateInner() {
           [now]: {
             ...nowData,
             height: `${height}px`,
+            lineHeight: `${height}px`,
+            fontSize: `${height}px`,
           },
         });
       }
@@ -405,7 +420,6 @@ export default function TemplateInner() {
     dot = (e.target as Element).getAttribute("data-dot")!;
     type = (e.target as Element).getAttribute("div-type")!;
     setTarget(now);
-    console.log(type);
     if (!now && !dot) return;
     if (dot) {
       dotFunc[dot as keyof DotFunc](now);
@@ -481,6 +495,7 @@ export default function TemplateInner() {
             className={classnames(style.abs, item[0], style.text)}
             style={textList[item[0]]}
           >
+            文字位
             {target === item[0]
               ? ["top", "bottom"].map((items, index) => (
                   <span
@@ -508,11 +523,26 @@ export default function TemplateInner() {
 
       <Form>
         <Form.Item label="选择编辑页">
-          <Radio.Group onChange={onChange} value={checked}>
-            <Radio value={1}>封面</Radio>
-            <Radio value={2}>页面1</Radio>
-            <Radio value={3}>页面2</Radio>
-            <Radio value={4}>页面3</Radio>
+          <Radio.Group
+            value={checked}
+            onChange={(e) => {
+              pageList[checked] = { imageList, textList };
+              setChecked(e.target.value);
+              setImageList(pageList[e.target.value]?.imageList||{});
+              setTextList(pageList[e.target.value]?.textList||{});
+            }}
+          >
+            <Radio value={0} key={0}>
+              封面
+            </Radio>
+            {Array.from({ length: pagination }).map((item, index) => (
+              <Radio key={index + 1} value={index + 1}>
+                页面{index + 1}
+              </Radio>
+            ))}
+            <Radio key={pagination + 1} value={pagination + 1}>
+              背面
+            </Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item label="选择编辑页">
@@ -521,8 +551,10 @@ export default function TemplateInner() {
               setTextList({
                 ...textList,
                 [`text${textIndex}`]: {
-                  height: "100px",
+                  height: "20px",
                   top: "100px",
+                  lineHeight: "20px",
+                  fontSize: "20px",
                 },
               });
               textIndex += 1;
