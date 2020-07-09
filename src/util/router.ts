@@ -33,4 +33,6 @@ export const routerObj: RouterObj = {
     '/editBanner': { title: '添加图片', key: '22' },
     '/editBannerSearch': { title: '编辑图片', key: '22' },
     '/login': { title: '登录', key: '' },
+    '/distribution': { title: '分销比例', key: '23' },
+    '/setting': { title: '接口配置', key: '24' },
 }

@@ -22,6 +22,8 @@ import commission from "@/page/commission";
 import withdrawalLog from "@/page/commission/withdrawalLog";
 import dataStatistics from "@/page/dataStatistics";
 import systemSetting from "@/page/systemSetting";
+import setting from "@/page/setting";
+import distribution from "@/page/distribution";
 import editBanner from "@/page/systemSetting/editBanner";
 import Sider from "@/layout/Sider";
 import Top from "@/layout/Top";
@@ -71,6 +73,8 @@ export default function Layouts() {
               <Route exact path="/dataStatistics" component={dataStatistics} />
               <Route exact path="/systemSetting" component={systemSetting} />
               <Route exact path="/editBanner" component={editBanner} />
+              <Route exact path="/distribution" component={distribution} />
+              <Route exact path="/setting" component={setting} />
             </Switch>
           </Content>
         </Layout>

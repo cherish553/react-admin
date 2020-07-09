@@ -84,12 +84,21 @@ const Siders = (props: RouteComponentProps) => {
             提现申请记录
           </Menu.Item>
         </SubMenu>
+
         <Menu.Item key="21" onClick={() => jumpToPage("/dataStatistics")}>
           数据统计
         </Menu.Item>
-        <Menu.Item key="22" onClick={() => jumpToPage("/systemSetting")}>
-          系统设置
-        </Menu.Item>
+        <SubMenu key="sub6" icon={<UserOutlined />} title="系统设置">
+          <Menu.Item key="22" onClick={() => jumpToPage("/systemSetting")}>
+            系统设置
+          </Menu.Item>
+          <Menu.Item key="23" onClick={() => jumpToPage("/distribution")}>
+            分销比例
+          </Menu.Item>
+          <Menu.Item key="24" onClick={() => jumpToPage("/setting")}>
+            接口配置
+          </Menu.Item>
+        </SubMenu>
       </Menu>
     </Sider>
   );
