@@ -17,7 +17,6 @@ import afterSalesDetail from "@/page/orderList/afterSales/afterSalesDetail";
 import coupon from "@/page/coupon";
 import addCoupon from "@/page/coupon/addCoupon";
 import newUserCoupon from "@/page/coupon/newUserCoupon";
-import sendCoupon from "@/page/coupon/sendCoupon";
 import showWorks from "@/page/showWorks";
 import commission from "@/page/commission";
 import withdrawalLog from "@/page/commission/withdrawalLog";
@@ -66,7 +65,6 @@ export default function Layouts() {
               <Route exact path="/coupon" component={coupon} />
               <Route exact path="/addCoupon" component={addCoupon} />
               <Route exact path="/newUserCoupon" component={newUserCoupon} />
-              <Route exact path="/sendCoupon" component={sendCoupon} />
               <Route exact path="/showWorks" component={showWorks} />
               <Route exact path="/commission" component={commission} />
               <Route exact path="/withdrawalLog" component={withdrawalLog} />
