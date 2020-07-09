@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
-import { Form, Radio, Button } from "antd";
+import { Form, Radio, Button, message } from "antd";
 import { GoodsModel } from "@api/template/api";
 let now = ""; // 当前target（可拖拽元素）
 let dot = ""; // 当前dot（拉伸点）
@@ -57,6 +57,10 @@ const pageList: Array<{
     imageList: {},
     textList: {},
   },
+  {
+    imageList: {},
+    textList: {},
+  },
 ];
 interface Props {
   data: {
@@ -69,6 +73,14 @@ export default function TemplateInner(props: Props) {
   const {
     data: { formData },
   } = props;
+  useEffect(() => {
+    Array.from({ length: parseInt(formData.numberPages) }).forEach((item) =>
+      pageList.push({
+        textList: {},
+        imageList: {},
+      })
+    );
+  }, []);
   const pagination = parseInt(formData.numberPages);
   const [checked, setChecked] = useState(0);
   const [target, setTarget] = useState("");
@@ -444,7 +456,12 @@ export default function TemplateInner(props: Props) {
     window.addEventListener("mouseup", onMouseUp);
   };
   const clearCanvas = () => {
-    console.log(pageList[checked]);
+    pageList[checked] = {
+      imageList: {},
+      textList: {},
+    };
+    setImageList({});
+    setTextList({});
   };
   function deletePlaceholder(list: string, key: string) {
     let newList;
@@ -457,6 +474,26 @@ export default function TemplateInner(props: Props) {
       delete newList[key];
       setImageList(newList);
     }
+  }
+  useEffect(() => {
+    pageList[checked] = { imageList, textList };
+  }, [imageList, textList]);
+  function saveData() {
+    let flag: string | number = pageList.findIndex(
+      (item) =>
+        !Object.keys(item.imageList).length &&
+        !Object.keys(item.textList).length
+    );
+    if (~flag) {
+      flag =
+        flag === 0
+          ? "封面"
+          : flag === pageList.length - 1
+          ? "背面"
+          : `第${flag }页`;
+      return message.error(`${flag}数据为空`);
+    }
+    console.log(flag)
   }
   return (
     <div className={style.flex}>
@@ -598,7 +635,7 @@ export default function TemplateInner(props: Props) {
             添加图片位
           </Button>
           <Button onClick={clearCanvas}>清空画板</Button>
-          <Button>保存画板</Button>
+          <Button onClick={saveData}>保存画板</Button>
         </Form.Item>
       </Form>
     </div>
