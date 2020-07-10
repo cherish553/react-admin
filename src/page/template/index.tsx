@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
-import classnames from "classnames";
-import { Card, Input, Button, Table } from "antd";
-import { useHistory } from "react-router-dom";
+import { Card, Button, Table } from "antd";
 import { getTemplateList, delTemplateList } from "@api/template";
+import { TemplateListData } from "@api/template/api";
 import { useTableHook, useDelData } from "@/hooks";
-interface HomeList {
-  title: string;
-  count: number;
-}
-export default function UserList() {
+import { useHistory } from "react-router-dom";
+
+function UserList() {
   let router = useHistory();
-  const [dataList, pagination, , getDataList] = useTableHook<any>(
+  const [dataList, pagination, , getDataList] = useTableHook<TemplateListData>(
     getTemplateList
   );
-  const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<any>(
+  const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<TemplateListData>(
     delTemplateList,
-    getDataList,
-    "type_id"
+    getDataList
   );
   const jumpToPage = (url: string, id?: number) => {
     router.push({
@@ -25,50 +21,34 @@ export default function UserList() {
       search: id ? `?id=${id}` : "",
     });
   };
-  const [serachForm, setSerachForm] = useState({
-    userName: "cherish",
-    phone: "15628771443",
-  });
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      lastLoginDate: "2020-6-5",
-    },
-  ]);
-  const [userColumn, setuserColumn] = useState([
+  const [dataColumn] = useState([
     {
       title: "模板名称",
-      dataIndex: "userName",
+      dataIndex: "name",
     },
     {
       title: "适合尺寸",
-      dataIndex: "phone",
+      dataIndex: "size",
     },
     {
       title: "使用中的产品数",
-      dataIndex: "dealCount",
+      dataIndex: "goodsNum",
     },
     {
       title: "操作",
       dataIndex: "",
-      render: (_: any, e: any) => (
+      render: (_: any, row: TemplateListData) => (
         <>
-          <Button size={"small"} onClick={() => changes(e)}>
+          <Button size={"small"} onClick={() => jumpToPage("/editTemplate",row.id)}>
             编辑
           </Button>
-          <Button size={"small"} onClick={() => changes(e)}>
+          <Button size={"small"}  onClick={() => showDeleteConfirm([row.id])}>
             删除
           </Button>
         </>
       ),
     },
   ]);
-  const changes = (e: any): void => {
-    console.log(e);
-  };
   return (
     <div>
       <Card>
@@ -87,15 +67,17 @@ export default function UserList() {
       </Card>
       <div>
         <Table
+          rowKey="id"
           pagination={{ current: pagination.page, total: pagination.total }}
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
           }}
-          columns={userColumn}
+          columns={dataColumn}
           dataSource={dataList}
         ></Table>
       </div>
     </div>
   );
 }
+export default UserList;

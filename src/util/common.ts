@@ -42,3 +42,6 @@ export function query<T>(str: string): T | {} {
         return pre
     }, {})
 }
+export function slice(str: string, start = 0, end = -2) {
+    return str.slice(start, end)
+}

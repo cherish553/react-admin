@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Form, Radio, Button, message } from "antd";
-import { GoodsModel } from "@api/template/api";
+import { GoodsModel, PageList, List } from "@api/template/api";
+import { slice } from "@/util/common";
 let now = ""; // 当前target（可拖拽元素）
 let dot = ""; // 当前dot（拉伸点）
 let type = ""; // 当前type（决定是否是文字位或图片位）
@@ -21,25 +22,24 @@ interface DotFunc {
   leftBottom: Function;
   leftTOP: Function;
 }
-interface imageList {
+export interface imageList {
   [propName: string]: StyleImageProp;
 }
-interface textList {
+export interface textList {
   [propName: string]: StyleTextProp;
 }
-interface StyleImageProp {
+export interface StyleImageProp {
   height: string;
   width: string;
-  background: string;
   left: string;
   top: string;
+  id?: string;
 }
-interface StyleTextProp {
-  height: string;
-  top: string;
+export type StyleTextProp = Pick<StyleImageProp, "height" | "top" | "left"> & {
   lineHeight: string;
   fontSize: string;
-}
+  id?: string;
+};
 
 interface Canvas {
   offsetWidth: number;
@@ -47,12 +47,7 @@ interface Canvas {
   offsetLeft: number;
   offsetTop: number;
 }
-let imageIndex = 0;
-let textIndex = 0;
-const pageList: Array<{
-  imageList: imageList;
-  textList: textList;
-}> = [
+let pageList: List[] = [
   {
     imageList: {},
     textList: {},
@@ -67,20 +62,14 @@ interface Props {
     formData: GoodsModel;
     setFormData: React.Dispatch<React.SetStateAction<GoodsModel>>;
   };
+  pageList?: List[];
 }
 export default function TemplateInner(props: Props) {
   const canvas = useRef<Canvas>() as React.MutableRefObject<Canvas>;
   const {
-    data: { formData },
+    data: { formData, setFormData },
+    pageList: pageListData,
   } = props;
-  useEffect(() => {
-    Array.from({ length: parseInt(formData.numberPages) }).forEach((item) =>
-      pageList.push({
-        textList: {},
-        imageList: {},
-      })
-    );
-  }, []);
   const pagination = parseInt(formData.numberPages);
   const [checked, setChecked] = useState(0);
   const [target, setTarget] = useState("");
@@ -90,6 +79,22 @@ export default function TemplateInner(props: Props) {
     left: 0,
     top: 0,
   });
+  const [imageList, setImageList] = useState<imageList>({});
+  const [textList, setTextList] = useState<textList>({});
+  useEffect(() => {
+    if (pageListData) {
+      pageList = pageListData;
+      setImageList(pageListData[0].imageList);
+      setTextList(pageListData[0].textList);
+    } else {
+      Array.from({ length: parseInt(formData.numberPages) }).forEach((item) =>
+        pageList.push({
+          textList: {},
+          imageList: {},
+        })
+      );
+    }
+  }, []);
   useEffect(() => {
     scrollNode = document.querySelector<Element>("main")!;
   }, []);
@@ -103,10 +108,8 @@ export default function TemplateInner(props: Props) {
   }, [canvas, target]);
 
   useEffect(() => {
-    console.log(pageList);
-  }, [checked]);
-  const [imageList, setImageList] = useState<imageList>({});
-  const [textList, setTextList] = useState<textList>({});
+    pageList[checked] = { imageList, textList };
+  }, [imageList, textList]);
   const drag = (e: MouseEvent) => {
     let left, top, width, height, nowData;
     let X = e.pageX;
@@ -114,12 +117,12 @@ export default function TemplateInner(props: Props) {
     X = X - canvas.current.offsetLeft;
     Y = Y - canvas.current.offsetTop;
     if (type === "imageList") {
-      width = +imageList[now].width.slice(0, -2);
-      height = +imageList[now].height.slice(0, -2);
+      width = +slice(imageList[now].width);
+      height = +slice(imageList[now].height);
       nowData = imageList[now];
     } else {
       width = 100;
-      height = +textList[now].height.slice(0, -2);
+      height = +slice(textList[now].height);
       nowData = textList[now];
     }
 
@@ -142,7 +145,6 @@ export default function TemplateInner(props: Props) {
     } else {
       top = 0;
     }
-    // const nowData = imageList[now];
     if (type === "imageList") {
       setImageList({
         ...imageList,
@@ -171,7 +173,7 @@ export default function TemplateInner(props: Props) {
       nowData: StyleImageProp
     ) => {
       const left = canvas.current.offsetLeft;
-      const maxWidth = parent.width - +nowData.left.slice(0, -2);
+      const maxWidth = parent.width - +slice(nowData.left);
       let width = e.pageX - left - node.offsetLeft;
       if (width < 20) {
         width = 20;
@@ -182,19 +184,19 @@ export default function TemplateInner(props: Props) {
     },
     changeTop: (
       e: MouseEvent,
-      node: HTMLDivElement,
+      _node: HTMLDivElement,
       nowData: StyleImageProp | StyleTextProp
     ) => {
       const offsetTop = canvas.current.offsetTop;
-      const maxHeihgt = +fixTop + +nowData.height.slice(0, -2);
+      const maxHeihgt = +fixTop + +slice(nowData.height);
       let height =
         +fixTop +
-        +nowData.height.slice(0, -2) -
+        +slice(nowData.height) -
         (e.pageY + scrollNode.scrollTop - offsetTop);
       let top = e.pageY + scrollNode.scrollTop - offsetTop;
       if (height < 20) {
         height = 20;
-        top = +fixTop + (+nowData.height.slice(0, -2) - 20);
+        top = +fixTop + (+slice(nowData.height) - 20);
       } else if (height > maxHeihgt) {
         height = maxHeihgt;
         top = 0;
@@ -203,19 +205,19 @@ export default function TemplateInner(props: Props) {
     },
     changeLeft: (
       e: MouseEvent,
-      node: HTMLDivElement,
+      _node: HTMLDivElement,
       nowData: StyleImageProp
     ) => {
       const offsetLeft = canvas.current.offsetLeft;
-      const maxWidth = +fixLeft + +nowData.width.slice(0, -2);
+      const maxWidth = +fixLeft + +slice(nowData.width);
       let width =
         +fixLeft +
-        +nowData.width.slice(0, -2) -
+        +slice(nowData.width) -
         (e.pageX + scrollNode.scrollLeft - offsetLeft);
       let left = e.pageX + scrollNode.scrollLeft - offsetLeft;
       if (width < 20) {
         width = 20;
-        left = +fixLeft + (+nowData.width.slice(0, -2) - 20);
+        left = +fixLeft + (+slice(nowData.width) - 20);
       } else if (width > maxWidth) {
         width = maxWidth;
         left = 0;
@@ -228,7 +230,7 @@ export default function TemplateInner(props: Props) {
       nowData: StyleImageProp | StyleTextProp
     ) => {
       const top = canvas.current.offsetTop;
-      const maxHeight = parent.height - +nowData.top.slice(0, -2);
+      const maxHeight = parent.height - +slice(nowData.top);
       let height = e.pageY + scrollNode.scrollTop - top - node.offsetTop;
       if (height < 20) {
         height = 20;
@@ -237,12 +239,6 @@ export default function TemplateInner(props: Props) {
       }
       return height;
     },
-  };
-  const onChange = (e: any) => {
-    console.log(e);
-    // console.log("radio checked", e.target.value);
-    // setChecked(e.target.value);
-    // console.log(e)
   };
   const onMouseUp = (e: MouseEvent) => {
     window.removeEventListener("mousemove", drag);
@@ -400,7 +396,7 @@ export default function TemplateInner(props: Props) {
   };
   const dotFunc: DotFunc = {
     rightTOP: (now: string) => {
-      fixTop = imageList[now].top.slice(0, -2);
+      fixTop = slice(imageList[now].top);
       window.addEventListener("mousemove", draw.changeRrightTop);
       window.addEventListener("mouseup", onMouseUp); // 移除事件
     },
@@ -414,9 +410,9 @@ export default function TemplateInner(props: Props) {
     },
     top: (now: string) => {
       if (type === "textList") {
-        fixTop = textList[now].top.slice(0, -2);
+        fixTop = slice(textList[now].top);
       } else {
-        fixTop = imageList[now].top.slice(0, -2);
+        fixTop = slice(imageList[now].top);
       }
       window.addEventListener("mousemove", draw.changeTop);
       window.addEventListener("mouseup", onMouseUp);
@@ -426,18 +422,18 @@ export default function TemplateInner(props: Props) {
       window.addEventListener("mouseup", onMouseUp);
     },
     left: (now: string) => {
-      fixLeft = imageList[now].left.slice(0, -2);
+      fixLeft = slice(imageList[now].left);
       window.addEventListener("mousemove", draw.changeLeft);
       window.addEventListener("mouseup", onMouseUp);
     },
     leftBottom: (now: string) => {
-      fixLeft = imageList[now].left.slice(0, -2);
+      fixLeft = slice(imageList[now].left);
       window.addEventListener("mousemove", draw.changeLeftBottom);
       window.addEventListener("mouseup", onMouseUp);
     },
     leftTOP: (now: string) => {
-      fixLeft = imageList[now].left.slice(0, -2);
-      fixTop = imageList[now].top.slice(0, -2);
+      fixLeft = slice(imageList[now].left);
+      fixTop = slice(imageList[now].top);
       window.addEventListener("mousemove", draw.changeLeftTOP);
       window.addEventListener("mouseup", onMouseUp);
     },
@@ -475,9 +471,6 @@ export default function TemplateInner(props: Props) {
       setImageList(newList);
     }
   }
-  useEffect(() => {
-    pageList[checked] = { imageList, textList };
-  }, [imageList, textList]);
   function saveData() {
     let flag: string | number = pageList.findIndex(
       (item) =>
@@ -490,10 +483,35 @@ export default function TemplateInner(props: Props) {
           ? "封面"
           : flag === pageList.length - 1
           ? "背面"
-          : `第${flag }页`;
+          : `第${flag}页`;
       return message.error(`${flag}数据为空`);
     }
-    console.log(flag)
+    const data = pageList.reduce((pre, now, index) => {
+      const image = Object.keys(now.imageList).map((item) => ({
+        id: now.imageList[item].id ?? "",
+        height: slice(now.imageList[item].height),
+        width: slice(now.imageList[item].width),
+        top: slice(now.imageList[item].top),
+        left: slice(now.imageList[item].top),
+        type: "1",
+        pages: index,
+      }));
+      const text = Object.keys(now.textList).map((item) => ({
+        id: now.textList[item].id ?? "",
+        height: slice(now.textList[item].height),
+        width: "0",
+        top: slice(now.textList[item].top),
+        left: slice(now.textList[item].top),
+        type: "2",
+        pages: index,
+      }));
+      pre.push(...image, ...text);
+      return pre;
+    }, [] as Array<PageList>);
+    setFormData({
+      ...formData,
+      pageList: data,
+    });
   }
   return (
     <div className={style.flex}>
@@ -507,7 +525,7 @@ export default function TemplateInner(props: Props) {
             div-type="imageList"
             key={item[0]}
             data-type={item[0]}
-            className={classnames(style.abs, item[0])}
+            className={classnames(style.abs, item[0], style.bgc)}
             style={imageList[item[0]]}
           >
             {target === item[0]
@@ -605,14 +623,14 @@ export default function TemplateInner(props: Props) {
             onClick={() => {
               setTextList({
                 ...textList,
-                [`text${textIndex}`]: {
+                [`text${+new Date()}`]: {
                   height: "20px",
                   top: "100px",
                   lineHeight: "20px",
                   fontSize: "20px",
+                  left: "100px",
                 },
               });
-              textIndex += 1;
             }}
           >
             添加文字位
@@ -621,15 +639,13 @@ export default function TemplateInner(props: Props) {
             onClick={() => {
               setImageList({
                 ...imageList,
-                [`image${imageIndex}`]: {
+                [`image${+new Date()}`]: {
                   height: "100px",
                   width: "100px",
-                  background: "skyblue",
                   left: "100px",
                   top: "100px",
                 },
               });
-              imageIndex += 1;
             }}
           >
             添加图片位
