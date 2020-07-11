@@ -1,54 +1,61 @@
 import React, { useState, useEffect } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
-import { Card, Input, Button, Table, DatePicker } from "antd";
+import { Card, Input, Button, Table, DatePicker, message } from "antd";
 import locale from "antd/es/date-picker/locale/zh_CN";
+import {
+  getWithdrawalList,
+  getHandleWithdrawalPass,
+  getHandleWithdrawalReject,
+} from "@api/commission";
+import { WithdrawalListData } from "@api/commission/api";
+import { useTableHook } from "@/hooks";
 import "moment/locale/zh-cn";
 const { RangePicker } = DatePicker;
-interface HomeList {
-  title: string;
-  count: number;
+enum Status {
+  "审核中",
+  "审核通过",
+  "驳回",
 }
 export default function WithdrawlLog() {
   const [serachForm, setSerachForm] = useState({
     userName: "cherish",
     phone: "15628771443",
   });
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      a:'1',
-      lastLoginDate: "2020-6-5",
-    },
-  ]);
+  const [dataList, pagination, , getDataList] = useTableHook<
+    WithdrawalListData
+  >(getWithdrawalList);
+  const [delDataIds, setDelDataIds] = useState<Array<string> | []>([]);
   const [rowSelection] = useState({
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
+    onChange: (
+      _selectedRowKeys: React.Key[],
+      selectedRows: Array<WithdrawalListData>
+    ) => {
+      setDelDataIds(selectedRows.map((item) => item["id"]) as string[] | []);
     },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-    }),
   });
-  const [userColumn, setuserColumn] = useState([
+  const getHandleWithdrawal = async (id: string[], status: Status) => {
+    if (!id.length) return message.error("至少选择一条数据");
+    if (status === Status["审核通过"]) {
+      await getHandleWithdrawalPass({ id });
+    } else {
+      await getHandleWithdrawalReject({ id });
+    }
+    getDataList()
+    message.success("设置成功");
+  };
+  const [dataColumn] = useState([
     {
       title: "用户昵称",
-      dataIndex: "userName",
+      dataIndex: "user_name",
     },
     {
       title: "手机号",
-      dataIndex: "phone",
+      dataIndex: "mobile",
     },
     {
       title: "提现申请金额",
-      dataIndex: "dealCount",
+      dataIndex: "money",
     },
     {
       title: "申请时间",
@@ -56,15 +63,26 @@ export default function WithdrawlLog() {
     },
     {
       title: "状态",
-      dataIndex: "a",
+      dataIndex: "status",
+      render: (_: any, row: WithdrawalListData) => <>{Status[row.status]}</>,
     },
     {
       title: "操作",
       dataIndex: "",
-      render: (_: any, e: any) => (
+      render: (_: any, row: WithdrawalListData) => (
         <>
-          <Button size={"small"}>设置为已处理</Button>
-          <Button size={"small"}>设置为未处理</Button>
+          <Button
+            size={"small"}
+            onClick={() => getHandleWithdrawal([row.id], Status["审核通过"])}
+          >
+            设置为已处理
+          </Button>
+          <Button
+            size={"small"}
+            onClick={() => getHandleWithdrawal([row.id], Status["驳回"])}
+          >
+            设置为未处理
+          </Button>
         </>
       ),
     },
@@ -105,17 +123,25 @@ export default function WithdrawlLog() {
         </div>
       </Card>
       <div>
-        <Button>设置为已处理</Button>
-        <Button>设置为未处理</Button>
+        <Button
+          onClick={() => getHandleWithdrawal(delDataIds, Status["审核通过"])}
+        >
+          设置为已处理
+        </Button>
+        <Button onClick={() => getHandleWithdrawal(delDataIds, Status["驳回"])}>
+          设置为未处理
+        </Button>
       </div>
       <div>
         <Table
+          rowKey="id"
           rowSelection={{
             type: "checkbox",
             ...rowSelection,
           }}
-          columns={userColumn}
-          dataSource={userList}
+          pagination={{ current: pagination.page, total: pagination.total }}
+          columns={dataColumn}
+          dataSource={dataList}
         ></Table>
       </div>
     </div>

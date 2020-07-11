@@ -55,7 +55,8 @@ interface Id {
 export function useDelData<T>(
   delFunction: Function,
   callback: Function,
-  id = "id" as keyof T
+  id = "id" as keyof T,
+  tip = "删除"
 ) {
   const [delDataIds, setDelDataIds] = useState<Array<number> | []>([]);
   const [rowSelection] = useState({
@@ -70,7 +71,7 @@ export function useDelData<T>(
       return false;
     }
     confirm({
-      title: "确定删除数据?",
+      title: `确定${tip}数据?`,
       icon: <ExclamationCircleOutlined />,
       okText: "确定",
       okType: "danger",
@@ -86,7 +87,7 @@ export function useDelData<T>(
     const data = await delFunction({ id: ids.join(",") });
     if (!data) return false;
     setDelDataIds([]);
-    message.success("删除成功");
+    message.success(`${tip}成功`);
     return true;
   };
   let tuple: [ShowDeleteConfirm, number[] | [], RowSelection<T>];

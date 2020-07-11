@@ -3,7 +3,10 @@ import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card, Input, Button, Table, DatePicker } from "antd";
 import locale from "antd/es/date-picker/locale/zh_CN";
+import { useTableHook } from "@/hooks";
 import "moment/locale/zh-cn";
+import { getProportionList } from "@api/commission";
+import { ProportionListData } from "@api/commission/api";
 const { RangePicker } = DatePicker;
 interface HomeList {
   title: string;
@@ -11,47 +14,28 @@ interface HomeList {
 }
 export default function Commission() {
   const [serachForm, setSerachForm] = useState({
-    userName: "cherish",
-    phone: "15628771443",
+    user_name: "",
+    mobile: "",
   });
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      lastLoginDate: "2020-6-5",
-    },
-  ]);
-  const [rowSelection] = useState({
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-    }),
-  });
-  const [userColumn, setuserColumn] = useState([
+  const [dataList, pagination, , getDataList] = useTableHook<
+    ProportionListData
+  >(getProportionList, serachForm);
+  const [dataColumn] = useState([
     {
       title: "用户昵称",
-      dataIndex: "userName",
+      dataIndex: "user_name",
     },
     {
       title: "手机号",
-      dataIndex: "phone",
+      dataIndex: "mobile",
     },
     {
       title: "分佣金额",
-      dataIndex: "dealCount",
+      dataIndex: "commission",
     },
     {
       title: "交易时间",
-      dataIndex: "lastLoginDate",
+      dataIndex: "commission",
     },
   ]);
   return (
@@ -62,20 +46,20 @@ export default function Commission() {
             <p>用户昵称</p>
             <Input
               onChange={(e) =>
-                setSerachForm({ ...serachForm, userName: e.target.value })
+                setSerachForm({ ...serachForm, user_name: e.target.value })
               }
               placeholder="请输入用户昵称"
-              value={serachForm.userName}
+              value={serachForm.user_name}
             />
             <p>手机号</p>
             <Input
               maxLength={11}
               type={"tel"}
               onChange={(e) =>
-                setSerachForm({ ...serachForm, phone: e.target.value })
+                setSerachForm({ ...serachForm, mobile: e.target.value })
               }
               placeholder="请输入手机号"
-              value={serachForm.phone}
+              value={serachForm.mobile}
             />
             <p>交易时间</p>
             <RangePicker
@@ -84,15 +68,19 @@ export default function Commission() {
             />
           </div>
           <div>
-            <Button type={"primary"}>确定</Button>
+            <Button onClick={() => getDataList()} type={"primary"}>
+              确定
+            </Button>
             <Button type={"primary"}>重置</Button>
           </div>
         </div>
       </Card>
       <div>
         <Table
-          columns={userColumn}
-          dataSource={userList}
+          rowKey="user_id"
+          pagination={{ current: pagination.page, total: pagination.total }}
+          columns={dataColumn}
+          dataSource={dataList}
         ></Table>
       </div>
     </div>
