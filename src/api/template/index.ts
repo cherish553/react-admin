@@ -9,6 +9,7 @@ export const postEditGoodsModel = ({ pageList, numberPages, size, id, name }: Go
 // 模板详情
 export const getGoodsModel = async (data: { id: string }): Promise<GoodsModel<List>> => {
     const { pageList: pageLists, numberPages, ...rest } = await get<GoodsModel<PageList[]>>(`admin/getGoodsModel`, data)
+    console.log(pageLists)
     const pageList: List[] = pageLists.map((item) => (
         item.reduce((pre, now, index) => {
             +now.type === 1 ?

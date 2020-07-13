@@ -11,7 +11,7 @@ export interface GoodListData {
    created_time: string
    id: number
    index_img: string
-   is_recommend: 1
+   is_recommend: number
    model_id: number
    name: string
 }
@@ -39,3 +39,39 @@ export interface GoodSpecDetailChildren {
    name: string
 }
 export type EditGoodSpecParam = Pick<GoodSpecDetailChildren, 'id' | 'name' | 'children_id'>
+export interface EditPrintParam {
+   name: string
+   id?: string
+   class_id: string
+   index_img: string
+   model_id: string
+   desc: string
+   service_introduction: string
+   imgList: string
+   specList: string
+}
+export interface GoodsInfoData {
+   classList: ClassList
+   goodsInfo: Pick<EditPrintParam, 'class_id' | 'id' | 'index_img' | 'model_id' | 'name'> & { is_recommend: number, img_list: ImgList, spec_list: SpecList }
+   modelList: ModelList
+   specList: SpecListS
+}
+export interface ImgList {
+   id: number,
+   goods_id: number,
+   img_url: string,
+}
+export interface SpecList {
+   binding_spec_id: string
+   goods_id: string
+   id: string
+   number: string
+   paper_spec_id: string
+   price: string
+   printing_spec_id: string
+   size_spec_id: string
+   style_spec_id: string
+} 
+export type ClassList = Array<Pick<GoodListData, 'class_id' | 'name'>>
+export type ModelList = Array<Pick<GoodListData, 'id' | 'name'>>
+export type SpecListS = Array<Pick<GoodSpecDetail, 'code' | 'id' | 'name' | 'children_list'>>

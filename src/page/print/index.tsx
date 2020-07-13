@@ -18,7 +18,7 @@ export default function Category() {
       pathname: url,
     };
     if (id) {
-      obj = { ...obj, search: "?id=4" };
+      obj = { ...obj, search: `?id=${id}` };
     }
     router.push(obj);
   };
@@ -66,15 +66,15 @@ export default function Category() {
     {
       title: "操作",
       dataIndex: "",
-      render: (_: any, e: any) => (
+      render: (_: any, row: GoodListData) => (
         <>
-          <Button size={"small"} onClick={() => jumpToPage("/editPrint", 4)}>
+          <Button size={"small"} onClick={() => jumpToPage("/editPrint", row.id)}>
             编辑
           </Button>
-          <Button size={"small"} onClick={() => changes(e)}>
+          <Button size={"small"} onClick={() => changes(row)}>
             删除
           </Button>
-          <Button size={"small"} onClick={() => changes(e)}>
+          <Button size={"small"} onClick={() => changes(row)}>
             设置推荐
           </Button>
         </>

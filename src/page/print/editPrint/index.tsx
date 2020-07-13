@@ -1,15 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Select, Upload, Card, Table } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import Editor from "./component/editor";
 import Dialog from "./component/modal";
+import { query } from "@/util/common";
+import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import style from "./index.module.scss";
+import { withRouter, RouteComponentProps } from "react-router-dom";
+import cookie from 'js-cookie'
+import {
+  postEditGoods as PostEditGoods,
+  getGoodsInfo as GetGoodsInfo,
+} from "@api/print";
+import { ClassList, ModelList, SpecListS } from "@api/print/api";
+import { cpuUsage } from "process";
 const { Option } = Select;
-const layout = {
-  // labelCol: { span: 8 },
-  // wrapperCol: { span: 8 },
-};
-
+interface FileList {
+  [key: string]: UploadFile<any> | "" | Array<UploadFile<any>>;
+}
+function judgeSearch(queryData: {} | Id): queryData is Id {
+  return !!(queryData as Id).id;
+}
 function getBase64(img: any, callback: any) {
   const reader = new FileReader();
   reader.addEventListener("load", () => callback(reader.result));
@@ -27,10 +38,37 @@ function beforeUpload(file: any) {
   }
   return isJpgOrPng && isLt2M;
 }
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
-const EditPrint = () => {
+const EditPrint = (props: RouteComponentProps) => {
+  const [id, setId] = useState<number | string>("");
+  // const [fileList, setFileList] = useState<FileList>({
+  //   index_img: "",
+  //   imgList: [],
+  //   specList: "",
+  // });
+  useEffect(() => {
+    const queryData = query<Id>(props.location.search);
+    if (judgeSearch(queryData)) {
+      setId(queryData.id);
+      getGoodsInfo(queryData.id);
+    } else {
+      getGoodsInfo("");
+    }
+  }, []);
+  const [classList, setClassList] = useState<ClassList>([]);
+  const [modelList, setModelList] = useState<ModelList>([]);
+  const [specList, setSpecList] = useState<SpecListS>([]);
+  const getGoodsInfo = async (id?: number | string) => {
+    const { classList, goodsInfo, modelList, specList } = await GetGoodsInfo({
+      id,
+    });
+    setClassList(classList);
+    setModelList(modelList);
+    setSpecList(specList);
+    console.log(goodsInfo);
+    // console.log(data);
+  };
+  const [form] = Form.useForm();
+  // form.setFieldsValue(data);
   const [userList, setuserList] = useState([
     {
       key: 1,
@@ -43,6 +81,21 @@ const EditPrint = () => {
       d: "1",
     },
   ]);
+  const [formData, setFormData] = useState({
+    name: "",
+    class_id: "",
+    index_img: "",
+    model_id: "",
+    desc: "",
+    service_introduction: "",
+    imgList: [
+      {
+        id: "",
+        img_url: "",
+      },
+    ],
+    specList: "",
+  });
   const [userColumn, setuserColumn] = useState([
     {
       title: "尺寸",
@@ -79,19 +132,9 @@ const EditPrint = () => {
   const onFinish = (values: any) => {
     console.log("Success:", values);
   };
-
+  const [fileList, setFileList] = useState<any>([]);
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
-  };
-  const handleChange = (info: any) => {
-    if (info.file.status === "uploading") {
-      // this.setState({ loading: true });
-      return;
-    }
-    if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (imageUrl: any) => setImageUrl);
-    }
   };
   const [rowSelection] = useState({
     onChange: (selectedRowKeys: any, selectedRows: any) => {
@@ -112,10 +155,29 @@ const EditPrint = () => {
       <div className="ant-upload-text">上传图片</div>
     </div>
   );
+  // async function postEditGoods() {
+  //   await PostEditGoods();
+  // }
+  // 上传之前的处理
+  // const handleChange = (
+  //   info: UploadChangeParam<UploadFile<any>>,
+  //   type: string,
+  //   index?: number
+  // ) => {
+  //   let url = formData.index_img;
+  //   !!url && URL.revokeObjectURL(url);
+  //   setFileList({ ...fileList, [type]: { ...fileList[type], ...info.file } });
+  //   url = window.URL.createObjectURL(info.file);
+  //   setFormData({ ...formData, index_img: url });
+  // };
+  const handleChange = ({ fileList }: any) => {
+    console.log(fileList);
+    // setFileList({ fileList });
+  };
   return (
     <div>
       <Form
-        {...layout}
+        form={form}
         name="basic"
         initialValues={{ remember: true }}
         onFinish={onFinish}
@@ -126,7 +188,10 @@ const EditPrint = () => {
           name="username"
           rules={[{ required: true, message: "请输入印品名称" }]}
         >
-          <Input className={style.inputWidth} />
+          <Input
+            className={style.inputWidth}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
         </Form.Item>
 
         <Form.Item
@@ -134,30 +199,34 @@ const EditPrint = () => {
           name="password"
           rules={[{ required: true, message: "请输入印品分类" }]}
         >
-          <Select defaultValue="lucy" style={{ width: 120 }}>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
+          <Select
+            onChange={(e) => setFormData({ ...formData, class_id: e })}
+            value={formData.class_id}
+            style={{ width: 120 }}
+          >
+            {classList.map((item) => (
+              <Option value={item.class_id} key={item.class_id}>
+                {item.name}
+              </Option>
+            ))}
           </Select>
-          <Button>新增类目</Button>
+          {/* <Button>新增类目</Button> */}
         </Form.Item>
-
-        {/* <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item> */}
         <Form.Item label="印品缩略图">
           <Upload
             name="avatar"
             listType="picture-card"
             className="avatar-uploader"
             showUploadList={false}
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-            beforeUpload={beforeUpload}
-            onChange={handleChange}
+            beforeUpload={() => false}
+            // onChange={(e) => handleChange(e, "index_img")}
           >
-            {imageUrl ? (
-              <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+            {formData.index_img ? (
+              <img
+                src={formData.index_img}
+                alt="avatar"
+                style={{ width: "100%" }}
+              />
             ) : (
               uploadButton
             )}
@@ -166,29 +235,29 @@ const EditPrint = () => {
         <Form.Item label="产品图片">
           <Card>
             <div className={style.imageList}>
-              {Array.from({ length: 3 }).map((item, index) => (
-                <Upload
-                  key={index}
-                  name="avatar"
-                  listType="picture-card"
-                  className="avatar-uploader"
-                  showUploadList={false}
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  beforeUpload={beforeUpload}
-                  onChange={handleChange}
-                >
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt="avatar"
-                      style={{ width: "100%" }}
-                    />
-                  ) : (
-                    uploadButton
-                  )}
-                </Upload>
-              ))}
-              <Button type={"primary"}>添加更多图片</Button>
+              <Upload
+                name="avatar"
+                headers={{
+                  Authorization: `Bearer ${cookie.get("token")}`,
+                }}
+                listType="picture-card"
+                className="avatar-uploader"
+                fileList={fileList}
+                onChange={handleChange}
+              >
+                {uploadButton}
+              </Upload>
+              <Button
+                onClick={() =>
+                  setFormData({
+                    ...formData,
+                    imgList: [...formData.imgList, { id: "", img_url: "" }],
+                  })
+                }
+                type={"primary"}
+              >
+                添加更多图片
+              </Button>
             </div>
           </Card>
         </Form.Item>
@@ -199,9 +268,16 @@ const EditPrint = () => {
           <Editor />
         </Form.Item>
         <Form.Item label="设置模板">
-          <Select defaultValue="lucy" style={{ width: 120 }}>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
+          <Select
+            value={formData.model_id}
+            onChange={(e) => setFormData({ ...formData, model_id: e })}
+            style={{ width: 120 }}
+          >
+            {modelList.map((item) => (
+              <Option key={item.id} value={item.id}>
+                {item.name}
+              </Option>
+            ))}
           </Select>
           <Button>模板管理</Button>
         </Form.Item>
@@ -221,4 +297,4 @@ const EditPrint = () => {
   );
 };
 
-export default EditPrint;
+export default withRouter(EditPrint);

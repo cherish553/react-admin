@@ -1,11 +1,14 @@
 import { get, post, del } from '@axios'
-import { GoodClasslistData, GoodListData, EditGoodClass, GoodSpecDetail, EditGoodSpecParam } from './api'
+import { GoodClasslistData, GoodListData, EditGoodClass, GoodSpecDetail, EditGoodSpecParam, EditPrintParam, GoodsInfoData } from './api'
 
 // 获取印品分类列表
 export const getGoodsClassList = ({ page }: { page: number }): Promise<CommonPagination<GoodClasslistData>> => get('admin/goodsClassList', { page })
 
 // 获取印品列表
 export const getGoodList = ({ page }: { page: number }): Promise<CommonPagination<GoodListData>> => get('admin/goodsList', { page })
+
+// 新增、编辑印品
+export const postEditGoods = (data: EditPrintParam) => post(`admin/editGoods`, data)
 
 // 编辑印品分类
 export const postEditGoodClass = (data: EditGoodClass): Promise<[]> => post('admin/editGoodsClass', data)
@@ -30,3 +33,6 @@ export const postAddGoodSpec = ({ children_id, ...rest }: EditGoodSpecParam): Pr
 
 // 删除印品规格
 export const delGoodSpec = (data: { id: string }): Promise<[]> => del(`admin/delGoodsSpec`, data)
+
+// 编辑印品页面数据接口
+export const getGoodsInfo = (data: { id?: number|string }):Promise<GoodsInfoData> => get(`admin/getGoodsInfo`, data) 
