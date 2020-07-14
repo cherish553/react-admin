@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Select, Upload, Card, Table } from "antd";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Select, Upload, Card, Table, Modal } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import Editor from "./component/editor";
 import Dialog from "./component/modal";
-import { query } from "@/util/common";
+import { query, postUploadImage, changeBase64 } from "@/util/common";
 import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import style from "./index.module.scss";
 import { withRouter, RouteComponentProps } from "react-router-dom";
-import cookie from 'js-cookie'
 import {
   postEditGoods as PostEditGoods,
   getGoodsInfo as GetGoodsInfo,
 } from "@api/print";
-import { ClassList, ModelList, SpecListS } from "@api/print/api";
-import { cpuUsage } from "process";
+import { ClassList, ModelList, SpecListS, SpecList } from "@api/print/api";
 const { Option } = Select;
 interface FileList {
   [key: string]: UploadFile<any> | "" | Array<UploadFile<any>>;
@@ -21,23 +19,7 @@ interface FileList {
 function judgeSearch(queryData: {} | Id): queryData is Id {
   return !!(queryData as Id).id;
 }
-function getBase64(img: any, callback: any) {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
 
-function beforeUpload(file: any) {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    // message.error('You can only upload JPG/PNG file!');
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    // message.error('Image must smaller than 2MB!');
-  }
-  return isJpgOrPng && isLt2M;
-}
 const EditPrint = (props: RouteComponentProps) => {
   const [id, setId] = useState<number | string>("");
   // const [fileList, setFileList] = useState<FileList>({
@@ -64,23 +46,27 @@ const EditPrint = (props: RouteComponentProps) => {
     setClassList(classList);
     setModelList(modelList);
     setSpecList(specList);
-    console.log(goodsInfo);
-    // console.log(data);
+    // console.log(goodsInfo);
+    setDataList(goodsInfo.spec_list);
+    const { name, class_id, model_id, desc, service_introduction } = goodsInfo;
+    form.setFieldsValue({
+      name,
+      class_id,
+      model_id,
+      desc,
+      service_introduction,
+    });
   };
   const [form] = Form.useForm();
   // form.setFieldsValue(data);
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      a: "1",
-      b: "1",
-      c: "1",
-      d: "1",
-    },
-  ]);
+  const uploadFunc = async (e: any) => {
+    // console.log(e.file);
+    const data = await postUploadImage(e.file);
+    console.log(data);
+    console.log(1111);
+  };
+  // "id":"","size":2,"style":4,"paper":5,"binding":6,"printing":8,"price":1.25,"number":10}
+  const [dataList, setDataList] = useState<Array<SpecList>>([]);
   const [formData, setFormData] = useState({
     name: "",
     class_id: "",
@@ -88,44 +74,51 @@ const EditPrint = (props: RouteComponentProps) => {
     model_id: "",
     desc: "",
     service_introduction: "",
-    imgList: [
-      {
-        id: "",
-        img_url: "",
-      },
-    ],
-    specList: "",
+    imgList: [],
   });
-  const [userColumn, setuserColumn] = useState([
+  const [index_img, setIndex_img] = useState("");
+  const setFormDataDesc = (desc: string) => {
+    return setFormData({ ...formData, desc });
+  };
+  const setFormDataService = (service_introduction: string) => {
+    return setFormData({ ...formData, service_introduction });
+  };
+  const [visible, setVisible] = useState(false);
+  const [dataColumn] = useState([
     {
       title: "尺寸",
-      dataIndex: "userName",
+      dataIndex: "size_spec_name",
     },
     {
       title: "款式",
-      dataIndex: "phone",
+      dataIndex: "style_spec_name",
     },
     {
       title: "纸张",
-      dataIndex: "dealCount",
+      dataIndex: "paper_spec_name",
     },
     {
       title: "装订工艺",
-      dataIndex: "a",
+      dataIndex: "binding_spec_name",
     },
     {
       title: "印刷工艺",
-      dataIndex: "b",
+      dataIndex: "printing_spec_name",
     },
     {
       title: "价格",
-      dataIndex: "c",
-      render: (_: any, e: any) => <Input></Input>,
+      dataIndex: "price",
     },
     {
       title: "库存",
-      dataIndex: "d",
-      render: (_: any, e: any) => <Input></Input>,
+      dataIndex: "number",
+    },
+    {
+      title: "操作",
+      dataIndex: "",
+      render() {
+        return <Button>删除</Button>;
+      },
     },
   ]);
   const [imageUrl, setImageUrl] = useState();
@@ -155,6 +148,12 @@ const EditPrint = (props: RouteComponentProps) => {
       <div className="ant-upload-text">上传图片</div>
     </div>
   );
+  const handleChangeIndex = (e: any) => {
+    URL.revokeObjectURL(index_img);
+    setFormData({ ...formData, index_img: e.file });
+    const file = window.URL.createObjectURL(e.file);
+    setIndex_img(file);
+  };
   // async function postEditGoods() {
   //   await PostEditGoods();
   // }
@@ -170,8 +169,37 @@ const EditPrint = (props: RouteComponentProps) => {
   //   url = window.URL.createObjectURL(info.file);
   //   setFormData({ ...formData, index_img: url });
   // };
-  const handleChange = ({ fileList }: any) => {
-    console.log(fileList);
+  const handleChange = (e: any) => {
+    console.log(e)
+    // if (!e?.file) return;
+    const arr = e.fileList.map((item: any) => {
+      // item = new File(item, "");
+      const url = window.URL.createObjectURL(item);
+      return { url, status: "done", uid: +new Date(), file: item };
+    });
+    setFileList(arr);
+    // fileList.forEach(item=>{
+    //   URL.revokeObjectURL(item.url)
+    // })
+    // !!url && URL.revokeObjectURL(url);
+    // setFile(info.file);
+    // console.log(e);
+    // console.log(e);
+    // const arr: any[] = e.fileList.map((item: any) => {
+    //   item = new File('',item);
+    //   const url = window.URL.createObjectURL(item);
+    //   console.log(url);
+    //   return url;
+    //   // const obj = { url, status: "done", uid: +new Date(), file: item };
+    //   // return obj;
+    // });
+    // console.log(arr);
+    // setFileList(arr);
+    // console.log(fileList);
+    // console.log(url);
+    // console.log(222222222);
+    // const data = changeBase64(e)
+    // console.log(data)
     // setFileList({ fileList });
   };
   return (
@@ -185,7 +213,7 @@ const EditPrint = (props: RouteComponentProps) => {
       >
         <Form.Item
           label="印品名称"
-          name="username"
+          name="name"
           rules={[{ required: true, message: "请输入印品名称" }]}
         >
           <Input
@@ -196,7 +224,7 @@ const EditPrint = (props: RouteComponentProps) => {
 
         <Form.Item
           label="印品分类"
-          name="password"
+          name="class_id"
           rules={[{ required: true, message: "请输入印品分类" }]}
         >
           <Select
@@ -212,62 +240,56 @@ const EditPrint = (props: RouteComponentProps) => {
           </Select>
           {/* <Button>新增类目</Button> */}
         </Form.Item>
-        <Form.Item label="印品缩略图">
+        <Form.Item name="index_img" label="印品缩略图">
           <Upload
             name="avatar"
             listType="picture-card"
             className="avatar-uploader"
             showUploadList={false}
             beforeUpload={() => false}
-            // onChange={(e) => handleChange(e, "index_img")}
+            onChange={handleChangeIndex}
           >
-            {formData.index_img ? (
-              <img
-                src={formData.index_img}
-                alt="avatar"
-                style={{ width: "100%" }}
-              />
+            {index_img ? (
+              <img src={index_img} alt="avatar" style={{ width: "100%" }} />
             ) : (
               uploadButton
             )}
           </Upload>
         </Form.Item>
-        <Form.Item label="产品图片">
+        <Form.Item name="imgList" label="产品图片">
           <Card>
             <div className={style.imageList}>
               <Upload
+                // action={"/api/uploadImage"}
                 name="avatar"
-                headers={{
-                  Authorization: `Bearer ${cookie.get("token")}`,
-                }}
+                // showUploadList={false}
+                beforeUpload={() => false}
                 listType="picture-card"
                 className="avatar-uploader"
                 fileList={fileList}
                 onChange={handleChange}
+                // customRequest={(e) => uploadFunc(e)}
               >
                 {uploadButton}
               </Upload>
-              <Button
-                onClick={() =>
-                  setFormData({
-                    ...formData,
-                    imgList: [...formData.imgList, { id: "", img_url: "" }],
-                  })
-                }
-                type={"primary"}
-              >
-                添加更多图片
-              </Button>
             </div>
           </Card>
         </Form.Item>
-        <Form.Item label="产品描述">
-          <Editor />
+        <Form.Item name="desc" label="产品描述">
+          <Editor
+            outputHTML={formData.desc}
+            setOutputHTML={setFormDataDesc}
+            key={1}
+          />
         </Form.Item>
-        <Form.Item label="制作服务介绍">
-          <Editor />
+        <Form.Item name="service_introduction" label="制作服务介绍">
+          <Editor
+            outputHTML={formData.service_introduction}
+            setOutputHTML={setFormDataService}
+            key={2}
+          />
         </Form.Item>
-        <Form.Item label="设置模板">
+        <Form.Item name="model_id" label="设置模板">
           <Select
             value={formData.model_id}
             onChange={(e) => setFormData({ ...formData, model_id: e })}
@@ -279,20 +301,29 @@ const EditPrint = (props: RouteComponentProps) => {
               </Option>
             ))}
           </Select>
-          <Button>模板管理</Button>
         </Form.Item>
-        <Form.Item label="价格设置">
+        <Form.Item name="specList" label="价格设置">
+          <Button>删除</Button>
+          <Button onClick={() => setVisible(true)}>添加新规格</Button>
           <Table
+            rowKey="id"
             rowSelection={{
               type: "checkbox",
               ...rowSelection,
             }}
-            columns={userColumn}
-            dataSource={userList}
+            columns={dataColumn}
+            dataSource={dataList}
           ></Table>
         </Form.Item>
       </Form>
-      <Dialog />
+      <Dialog
+        dataList={dataList}
+        setDataList={setDataList}
+        visible={visible}
+        setVisible={setVisible}
+        specList={specList}
+        setSpecList={setSpecList}
+      />
     </div>
   );
 };

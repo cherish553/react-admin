@@ -1,52 +1,74 @@
 import "braft-editor/dist/index.css";
 import React from "react";
 import BraftEditor from "braft-editor";
-
-export default class BasicDemo extends React.Component {
+// import { ImageUtils } from "braft-finder";
+import { Upload } from "antd";
+import { postUploadImage } from "@/util/common";
+import { ContentUtils } from "braft-utils";
+interface Props {
+  outputHTML: string;
+  setOutputHTML: (desc: string) => void;
+}
+export default class BasicDemo extends React.Component<Props> {
   state = {
-    isLivinig:false,
-    editorState: BraftEditor.createEditorState("<p>Hello <b>World!</b></p>"), // 设置编辑器初始内容
-    outputHTML: "<p></p>",
+    editorState: BraftEditor.createEditorState(""), // 设置编辑器初始内容
   };
-
-  componentDidMount() {
-      this.setState({
-        isLivinig:true
-      })
-    // 3秒后更改编辑器内容
-    setTimeout(this.setEditorContentAsync, 3000);
-  }
-
-  componentWillUnmount() {
+  uploadHandler = async (param: any) => {
+    if (!param.file) {
+      return false;
+    }
+    const url = await postUploadImage(param.file);
+    if (!url) return;
     this.setState({
-        isLivinig:false
-      })
-  }
-
-  handleChange = (editorState:any) => {
-    this.setState({
-      editorState: editorState,
-      outputHTML: editorState.toHTML(),
+      editorState: ContentUtils.insertMedias(this.state.editorState, [
+        {
+          type: "IMAGE",
+          url: `${process.env.REACT_APP_BASE_URL}/storage/${url.slice(7)}`,
+        },
+      ]),
     });
   };
 
-  setEditorContentAsync = () => {
-    this.state.isLivinig &&
-      this.setState({
-        editorState: BraftEditor.createEditorState("<p>你好，<b>世界!</b><p>"),
-      });
+  handleChange = (editorState: any) => {
+    this.setState({
+      editorState: editorState,
+    });
+    this.props.setOutputHTML(editorState.toHTML());
   };
 
   render() {
-    const { editorState, outputHTML } = this.state;
+    const extendControls = [
+      {
+        key: "antd-uploader",
+        type: "component",
+        component: (
+          <Upload
+            accept="image/*"
+            showUploadList={false}
+            customRequest={this.uploadHandler}
+          >
+            <button
+              type="button"
+              className="control-item button upload-button"
+              data-title="插入图片"
+            >
+              上传图片
+            </button>
+          </Upload>
+        ),
+      },
+    ];
+    const { editorState } = this.state;
 
     return (
       <div>
         <div className="editor-wrapper">
-          <BraftEditor value={editorState} onChange={this.handleChange} />
+          <BraftEditor
+            value={editorState}
+            onChange={this.handleChange}
+            extendControls={extendControls as any}
+          />
         </div>
-        <h5>输出内容</h5>
-        <div className="output-content">{outputHTML}</div>
       </div>
     );
   }

@@ -52,7 +52,7 @@ export interface EditPrintParam {
 }
 export interface GoodsInfoData {
    classList: ClassList
-   goodsInfo: Pick<EditPrintParam, 'class_id' | 'id' | 'index_img' | 'model_id' | 'name'> & { is_recommend: number, img_list: ImgList, spec_list: SpecList }
+   goodsInfo: Pick<EditPrintParam, 'class_id' | 'id' | 'index_img' | 'model_id' | 'name'> & { is_recommend: number, img_list: ImgList, spec_list: Array<SpecList>, desc: string, service_introduction: string }
    modelList: ModelList
    specList: SpecListS
 }
@@ -71,7 +71,12 @@ export interface SpecList {
    printing_spec_id: string
    size_spec_id: string
    style_spec_id: string
-} 
+   binding_spec_name?: string
+   paper_spec_name?: string
+   printing_spec_name?: string
+   size_spec_name?: string
+   style_spec_name?: string
+}
 export type ClassList = Array<Pick<GoodListData, 'class_id' | 'name'>>
 export type ModelList = Array<Pick<GoodListData, 'id' | 'name'>>
-export type SpecListS = Array<Pick<GoodSpecDetail, 'code' | 'id' | 'name' | 'children_list'>>
+export type SpecListS = Array<Pick<GoodSpecDetail, 'code' | 'id' | 'name' | 'children_list'> & { value: number | string, names?: string }>

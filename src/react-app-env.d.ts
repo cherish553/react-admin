@@ -64,3 +64,12 @@ declare module '*.module.sass' {
   const classes: { readonly [key: string]: string };
   export default classes;
 }
+
+declare module 'braft-utils' {
+  const ContentUtils:any
+  export {ContentUtils};
+}
+declare module 'braft-finders' {
+  const ImageUtils:any
+  export {ImageUtils};
+}

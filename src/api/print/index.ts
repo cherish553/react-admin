@@ -35,4 +35,21 @@ export const postAddGoodSpec = ({ children_id, ...rest }: EditGoodSpecParam): Pr
 export const delGoodSpec = (data: { id: string }): Promise<[]> => del(`admin/delGoodsSpec`, data)
 
 // 编辑印品页面数据接口
-export const getGoodsInfo = (data: { id?: number|string }):Promise<GoodsInfoData> => get(`admin/getGoodsInfo`, data) 
+export const getGoodsInfo = (data: { id?: number | string }): Promise<GoodsInfoData> => get<GoodsInfoData>(`admin/getGoodsInfo`, data).then(res => {
+    res.specList = res.specList.map(item => ({ ...item, value: '' }))
+    if (Object.keys(res.goodsInfo).length) {
+        res.goodsInfo.spec_list.forEach(item => {
+            item.size_spec_name = res.specList[0].children_list.filter(items =>
+                items.id.toString() === item.size_spec_id.toString())[0].name
+            item.binding_spec_name = res.specList[3].children_list.filter(items =>
+                items.id.toString() === item.binding_spec_id.toString())[0].name
+            item.paper_spec_name = res.specList[2].children_list.filter(items =>
+                items.id.toString() === item.paper_spec_id.toString())[0].name
+            item.printing_spec_name = res.specList[4].children_list.filter(items =>
+                items.id.toString() === item.printing_spec_id.toString())[0].name
+            item.style_spec_name = res.specList[1].children_list.filter(items =>
+                items.id.toString() === item.style_spec_id.toString())[0].name
+        })
+    }
+    return res
+})

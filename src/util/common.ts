@@ -21,6 +21,12 @@ export async function postUploadImage(fileBlob: any): Promise<string | false> {
         });
     })
 }
+// 转换base64
+export function changeBase64(fileBlob: any) {
+    const reader = new FileReader();
+    reader.readAsDataURL(fileBlob);
+    return reader
+}
 // 筛选保留字段
 export function filter<T extends {}, K extends keyof T>(data: T) {
     const obj = {} as T
