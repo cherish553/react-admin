@@ -51,6 +51,7 @@ const Diadlog = (props: Props) => {
       number: formData.number,
       id: +new Date(),
     };
+    console.log(dataList)
     setDataList([...dataList, obj]);
     setVisible(false);
   };

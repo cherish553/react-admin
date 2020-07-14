@@ -22,11 +22,6 @@ function judgeSearch(queryData: {} | Id): queryData is Id {
 
 const EditPrint = (props: RouteComponentProps) => {
   const [id, setId] = useState<number | string>("");
-  // const [fileList, setFileList] = useState<FileList>({
-  //   index_img: "",
-  //   imgList: [],
-  //   specList: "",
-  // });
   useEffect(() => {
     const queryData = query<Id>(props.location.search);
     if (judgeSearch(queryData)) {
@@ -47,7 +42,7 @@ const EditPrint = (props: RouteComponentProps) => {
     setModelList(modelList);
     setSpecList(specList);
     // console.log(goodsInfo);
-    setDataList(goodsInfo.spec_list);
+    setDataList(goodsInfo.spec_list || []);
     const { name, class_id, model_id, desc, service_introduction } = goodsInfo;
     form.setFieldsValue({
       name,
@@ -154,53 +149,39 @@ const EditPrint = (props: RouteComponentProps) => {
     const file = window.URL.createObjectURL(e.file);
     setIndex_img(file);
   };
-  // async function postEditGoods() {
-  //   await PostEditGoods();
-  // }
-  // 上传之前的处理
-  // const handleChange = (
-  //   info: UploadChangeParam<UploadFile<any>>,
-  //   type: string,
-  //   index?: number
-  // ) => {
-  //   let url = formData.index_img;
-  //   !!url && URL.revokeObjectURL(url);
-  //   setFileList({ ...fileList, [type]: { ...fileList[type], ...info.file } });
-  //   url = window.URL.createObjectURL(info.file);
-  //   setFormData({ ...formData, index_img: url });
-  // };
-  const handleChange = (e: any) => {
-    console.log(e)
-    // if (!e?.file) return;
-    const arr = e.fileList.map((item: any) => {
-      // item = new File(item, "");
-      const url = window.URL.createObjectURL(item);
-      return { url, status: "done", uid: +new Date(), file: item };
+  const remove = (e: any) => {
+    console.log(e);
+  };
+  const saveData = async () => {
+    console.log(formData);
+    console.log(dataList);
+    console.log(fileList);
+    const { name, class_id, model_id, desc, service_introduction } = formData;
+    const fileListArr = await Promise.all(
+      fileList.map((item: any) => postUploadImage(item.file))
+    );
+    fileListArr.forEach((item: any, index) => {
+      item.id = fileList[index].id;
     });
-    setFileList(arr);
-    // fileList.forEach(item=>{
-    //   URL.revokeObjectURL(item.url)
-    // })
-    // !!url && URL.revokeObjectURL(url);
-    // setFile(info.file);
-    // console.log(e);
-    // console.log(e);
-    // const arr: any[] = e.fileList.map((item: any) => {
-    //   item = new File('',item);
-    //   const url = window.URL.createObjectURL(item);
-    //   console.log(url);
-    //   return url;
-    //   // const obj = { url, status: "done", uid: +new Date(), file: item };
-    //   // return obj;
-    // });
-    // console.log(arr);
-    // setFileList(arr);
-    // console.log(fileList);
-    // console.log(url);
-    // console.log(222222222);
-    // const data = changeBase64(e)
-    // console.log(data)
-    // setFileList({ fileList });
+    // specList.reduce((pre,now)=>{
+    //   {"id":"","size":2,"style":4,"paper":5,"binding":6,"printing":8,"price":1.25,"number":10}
+    // },{})
+  };
+  const handleChange = (e: any) => {
+    const fileList = e.fileList.map((item: any) => {
+      if (item.originFileObj) {
+        const url = window.URL.createObjectURL(item.originFileObj);
+        return {
+          url,
+          status: "done",
+          uid: +new Date(),
+          file: item.originFileObj,
+          id: "",
+        };
+      }
+      return item;
+    });
+    setFileList(fileList);
   };
   return (
     <div>
@@ -268,6 +249,7 @@ const EditPrint = (props: RouteComponentProps) => {
                 className="avatar-uploader"
                 fileList={fileList}
                 onChange={handleChange}
+                onRemove={remove}
                 // customRequest={(e) => uploadFunc(e)}
               >
                 {uploadButton}
@@ -324,6 +306,7 @@ const EditPrint = (props: RouteComponentProps) => {
         specList={specList}
         setSpecList={setSpecList}
       />
+      <Button onClick={saveData}>保存</Button>
     </div>
   );
 };
