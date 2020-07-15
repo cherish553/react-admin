@@ -1,5 +1,5 @@
 import React from "react";
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import home from "@/page/home";
 import userList from "@/page/userList";
 import template from "@/page/template";

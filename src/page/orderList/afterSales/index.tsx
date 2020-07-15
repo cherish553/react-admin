@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
 import { useHistory } from "react-router-dom";
 import classnames from "classnames";
@@ -20,18 +20,6 @@ export default function AfterSales() {
     userName: "cherish",
     phone: "15628771443",
   });
-  const [userList, setuserList] = useState([
-    {
-      key: 1,
-      userName: "cherish",
-      phone: "15628771443",
-      dealCount: 100,
-      lastLoginDate: "2020-6-5",
-      a: "2020-6-5",
-      b: "2020-6-5",
-      c: "2020-6-5",
-    },
-  ]);
   const [rowSelection] = useState({
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       console.log(
@@ -116,6 +104,7 @@ export default function AfterSales() {
       <div>
         <Table
           rowKey="id"
+          pagination={{ current: pagination.page, total: pagination.total }}
           rowSelection={{
             type: "checkbox",
             ...rowSelection,

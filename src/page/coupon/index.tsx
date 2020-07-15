@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
 import { Button, Table } from "antd";
 import { useTableHook, useDelData } from "@/hooks";

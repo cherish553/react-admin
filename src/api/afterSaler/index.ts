@@ -1,4 +1,4 @@
-import { get, post, del } from '@axios'
+import { get } from '@axios'
 import { AfterSaleListData, AfterSaleDetailData } from './api'
 // 申请售后列表
 export const getAfterSaleList = ({ page }: { page: number }): (Promise<CommonPagination<AfterSaleListData>>) =>

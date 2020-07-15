@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
 import { useHistory } from "react-router-dom";
 import classnames from "classnames";
-import { Card, Input, Button, Table, Form, message, Modal } from "antd";
+import { Card, Input, Button, Table, Form} from "antd";
 import { getBannerList, delBanner } from "@api/systemSetting";
 import { BannerDataDetail } from "@api/systemSetting/api";
 import { useTableHook, useDelData } from "@/hooks";
@@ -15,10 +15,6 @@ export default function SystemSetting() {
   const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<
     BannerDataDetail
   >(delBanner, getDataList);
-  const [serachForm, setSerachForm] = useState({
-    userName: "cherish",
-    phone: "15628771443",
-  });
   const jumpToPage = (url: string, id?: number) => {
     router.push({
       pathname: url,

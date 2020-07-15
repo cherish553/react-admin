@@ -1,4 +1,4 @@
-import { get, post, del } from '@axios'
+import { get } from '@axios'
 import { ProportionListData, WithdrawalListData, HandleWithdrawal } from './api'
 // 分佣列表
 export const getProportionList = (data: { page: number }): Promise<CommonPagination<ProportionListData>> => get(`admin/proportionList`, data)

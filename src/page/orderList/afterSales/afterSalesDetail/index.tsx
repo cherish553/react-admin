@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Form, Input, Button, Rate } from "antd";
+import { Form, Input, Button } from "antd";
 import style from "./index.module.scss";
 import { withRouter, RouteComponentProps } from "react-router-dom";
 import { query } from "@/util/common";

@@ -2,7 +2,6 @@ import React from "react";
 import { Form, Input, Button } from "antd";
 import style from "./index.module.scss";
 import { GoodsModel } from "@api/template/api";
-import SizeContext from "antd/lib/config-provider/SizeContext";
 interface Props {
   next?: React.Dispatch<React.SetStateAction<number>>;
   data: {

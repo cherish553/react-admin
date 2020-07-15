@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
 // import { getAdminLogin as GetAdminLogin } from "@api/index";
 import style from "./index.module.scss";
 import classnames from "classnames";

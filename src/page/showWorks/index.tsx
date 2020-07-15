@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import style from "./index.module.scss";
 import classnames from "classnames";
 import { Card, Input, Button, Table } from "antd";
@@ -11,7 +11,7 @@ export default function ShowWorks() {
     userName: "cherish",
     phone: "15628771443",
   });
-  const [userList, setuserList] = useState([
+  const [userList] = useState([
     {
       key: 1,
       userName: "cherish",
@@ -33,7 +33,7 @@ export default function ShowWorks() {
       name: record.name,
     }),
   });
-  const [userColumn, setuserColumn] = useState([
+  const [dataColumn] = useState([
     {
       title: "作品",
       dataIndex: "userName",
@@ -97,7 +97,7 @@ export default function ShowWorks() {
             type: "checkbox",
             ...rowSelection,
           }}
-          columns={userColumn}
+          columns={dataColumn}
           dataSource={userList}
         ></Table>
       </div>
