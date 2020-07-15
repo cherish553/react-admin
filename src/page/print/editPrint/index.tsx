@@ -4,26 +4,18 @@ import { PlusOutlined } from "@ant-design/icons";
 import Editor from "./component/editor";
 import Dialog from "./component/modal";
 import { query, postUploadImage } from "@/util/common";
-import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import style from "./index.module.scss";
-import {
-  withRouter,
-  RouteComponentProps,
-  useHistory,
-  Router,
-} from "react-router-dom";
+import { withRouter, RouteComponentProps, useHistory } from "react-router-dom";
 import {
   postEditGoods as PostEditGoods,
   getGoodsInfo as GetGoodsInfo,
 } from "@api/print";
 import { ClassList, ModelList, SpecListS, SpecList } from "@api/print/api";
-import Item from "antd/lib/list/Item";
-import { routerObj } from "@/util/router";
 const { Option } = Select;
 function judgeSearch(queryData: {} | Id): queryData is Id {
   return !!(queryData as Id).id;
 }
-
+let dataLists: Array<SpecList> = [];
 const EditPrint = (props: RouteComponentProps) => {
   let router = useHistory();
   const [id, setId] = useState<number | string>("");
@@ -36,6 +28,7 @@ const EditPrint = (props: RouteComponentProps) => {
       getGoodsInfo("");
     }
   }, []);
+
   const [classList, setClassList] = useState<ClassList>([]);
   const [modelList, setModelList] = useState<ModelList>([]);
   const [specList, setSpecList] = useState<SpecListS>([]);
@@ -83,6 +76,9 @@ const EditPrint = (props: RouteComponentProps) => {
   };
   const [form] = Form.useForm();
   const [dataList, setDataList] = useState<Array<SpecList>>([]);
+  useEffect(() => {
+    dataLists = dataList;
+  }, [dataList]);
   const [formData, setFormData] = useState({
     name: "",
     class_id: "",
@@ -98,12 +94,7 @@ const EditPrint = (props: RouteComponentProps) => {
   const setFormDataService = (service_introduction: string) => {
     return setFormData({ ...formData, service_introduction });
   };
-  function delDataList(id: string) {
-    console.log(dataList);
-    console.log(id);
-    const data = dataList.filter((item) => item.id !== id);
-    setDataList(data);
-  }
+
   const [visible, setVisible] = useState(false);
   const [dataColumn] = useState([
     {
@@ -141,7 +132,8 @@ const EditPrint = (props: RouteComponentProps) => {
         return (
           <Button
             onClick={() => {
-              delDataList(row.id);
+              const data = dataLists.filter((item) => row.id !== item.id);
+              setDataList(data);
             }}
           >
             删除
@@ -155,7 +147,6 @@ const EditPrint = (props: RouteComponentProps) => {
   const [rowSelection] = useState({
     onChange: (_selectedRowKeys: React.Key[], selectedRows: Array<any>) => {
       setDelDataIds(selectedRows.map((item) => item["id"]) as number[] | []);
-      console.log(selectedRows);
     },
   });
   const uploadButton = (
@@ -211,7 +202,7 @@ const EditPrint = (props: RouteComponentProps) => {
       url = (await postUploadImage(index_img)) as string;
       index_img = url;
     }
-    const data = await PostEditGoods({
+    await PostEditGoods({
       id: (id as string) || "",
       name,
       class_id,
