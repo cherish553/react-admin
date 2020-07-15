@@ -3,24 +3,29 @@ import { Form, Input, Button, Select, Upload, Card, Table, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import Editor from "./component/editor";
 import Dialog from "./component/modal";
-import { query, postUploadImage, changeBase64 } from "@/util/common";
+import { query, postUploadImage } from "@/util/common";
 import { UploadFile, UploadChangeParam } from "antd/lib/upload/interface";
 import style from "./index.module.scss";
-import { withRouter, RouteComponentProps } from "react-router-dom";
+import {
+  withRouter,
+  RouteComponentProps,
+  useHistory,
+  Router,
+} from "react-router-dom";
 import {
   postEditGoods as PostEditGoods,
   getGoodsInfo as GetGoodsInfo,
 } from "@api/print";
 import { ClassList, ModelList, SpecListS, SpecList } from "@api/print/api";
+import Item from "antd/lib/list/Item";
+import { routerObj } from "@/util/router";
 const { Option } = Select;
-interface FileList {
-  [key: string]: UploadFile<any> | "" | Array<UploadFile<any>>;
-}
 function judgeSearch(queryData: {} | Id): queryData is Id {
   return !!(queryData as Id).id;
 }
 
 const EditPrint = (props: RouteComponentProps) => {
+  let router = useHistory();
   const [id, setId] = useState<number | string>("");
   useEffect(() => {
     const queryData = query<Id>(props.location.search);
@@ -41,9 +46,25 @@ const EditPrint = (props: RouteComponentProps) => {
     setClassList(classList);
     setModelList(modelList);
     setSpecList(specList);
-    // console.log(goodsInfo);
-    setDataList(goodsInfo.spec_list || []);
-    const { name, class_id, model_id, desc, service_introduction } = goodsInfo;
+    const {
+      name,
+      class_id,
+      model_id,
+      desc,
+      service_introduction,
+      index_img,
+      spec_list,
+      img_list,
+    } = goodsInfo;
+    setDataList(spec_list || []);
+    const fileList = img_list.map((item) => ({
+      id: item.id,
+      url: item.img_url,
+      status: "done",
+      uid: item.id,
+      file: "",
+    }));
+    setFileList(fileList);
     form.setFieldsValue({
       name,
       class_id,
@@ -51,16 +72,16 @@ const EditPrint = (props: RouteComponentProps) => {
       desc,
       service_introduction,
     });
+    setFormData({
+      name,
+      class_id,
+      model_id,
+      desc,
+      service_introduction,
+      index_img,
+    });
   };
   const [form] = Form.useForm();
-  // form.setFieldsValue(data);
-  const uploadFunc = async (e: any) => {
-    // console.log(e.file);
-    const data = await postUploadImage(e.file);
-    console.log(data);
-    console.log(1111);
-  };
-  // "id":"","size":2,"style":4,"paper":5,"binding":6,"printing":8,"price":1.25,"number":10}
   const [dataList, setDataList] = useState<Array<SpecList>>([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -69,7 +90,6 @@ const EditPrint = (props: RouteComponentProps) => {
     model_id: "",
     desc: "",
     service_introduction: "",
-    imgList: [],
   });
   const [index_img, setIndex_img] = useState("");
   const setFormDataDesc = (desc: string) => {
@@ -78,6 +98,12 @@ const EditPrint = (props: RouteComponentProps) => {
   const setFormDataService = (service_introduction: string) => {
     return setFormData({ ...formData, service_introduction });
   };
+  function delDataList(id: string) {
+    console.log(dataList);
+    console.log(id);
+    const data = dataList.filter((item) => item.id !== id);
+    setDataList(data);
+  }
   const [visible, setVisible] = useState(false);
   const [dataColumn] = useState([
     {
@@ -111,31 +137,26 @@ const EditPrint = (props: RouteComponentProps) => {
     {
       title: "操作",
       dataIndex: "",
-      render() {
-        return <Button>删除</Button>;
+      render(_: any, row: SpecList) {
+        return (
+          <Button
+            onClick={() => {
+              delDataList(row.id);
+            }}
+          >
+            删除
+          </Button>
+        );
       },
     },
   ]);
-  const [imageUrl, setImageUrl] = useState();
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
-  };
   const [fileList, setFileList] = useState<any>([]);
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
+  const [delDataIds, setDelDataIds] = useState<Array<number> | []>([]);
   const [rowSelection] = useState({
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
+    onChange: (_selectedRowKeys: React.Key[], selectedRows: Array<any>) => {
+      setDelDataIds(selectedRows.map((item) => item["id"]) as number[] | []);
+      console.log(selectedRows);
     },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-    }),
   });
   const uploadButton = (
     <div>
@@ -149,23 +170,59 @@ const EditPrint = (props: RouteComponentProps) => {
     const file = window.URL.createObjectURL(e.file);
     setIndex_img(file);
   };
-  const remove = (e: any) => {
-    console.log(e);
-  };
   const saveData = async () => {
-    console.log(formData);
-    console.log(dataList);
-    console.log(fileList);
-    const { name, class_id, model_id, desc, service_introduction } = formData;
-    const fileListArr = await Promise.all(
-      fileList.map((item: any) => postUploadImage(item.file))
-    );
-    fileListArr.forEach((item: any, index) => {
-      item.id = fileList[index].id;
+    const specList = dataList.map((item) => ({
+      id: id.toString().length === 13 ? "" : id,
+      size: item.size_spec_id,
+      style: item.style_spec_id,
+      paper: item.paper_spec_id,
+      binding: item.binding_spec_id,
+      printing: item.printing_spec_id,
+      price: item.price,
+      number: item.number,
+    }));
+    let {
+      name,
+      class_id,
+      model_id,
+      desc,
+      service_introduction,
+      index_img,
+    } = formData;
+    let imgList: any[] = (
+      await Promise.all(
+        fileList
+          .filter((item: any) => item.file)
+          .map((item: any) => postUploadImage(item.file))
+      )
+    ).map((item: any) => ({
+      id: "",
+      img_url: item,
+    }));
+    const pre = fileList
+      .filter((item: any) => !item.file)
+      .map((item: any) => ({
+        id: item.id,
+        img_url: item.url,
+      }));
+    imgList = [...imgList, ...pre];
+    let url: string;
+    if (typeof formData.index_img !== "string") {
+      url = (await postUploadImage(index_img)) as string;
+      index_img = url;
+    }
+    const data = await PostEditGoods({
+      id: (id as string) || "",
+      name,
+      class_id,
+      model_id,
+      desc,
+      service_introduction,
+      imgList,
+      specList,
+      index_img,
     });
-    // specList.reduce((pre,now)=>{
-    //   {"id":"","size":2,"style":4,"paper":5,"binding":6,"printing":8,"price":1.25,"number":10}
-    // },{})
+    router.push("/print");
   };
   const handleChange = (e: any) => {
     const fileList = e.fileList.map((item: any) => {
@@ -185,13 +242,7 @@ const EditPrint = (props: RouteComponentProps) => {
   };
   return (
     <div>
-      <Form
-        form={form}
-        name="basic"
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-      >
+      <Form form={form} name="basic" initialValues={{ remember: true }}>
         <Form.Item
           label="印品名称"
           name="name"
@@ -223,6 +274,7 @@ const EditPrint = (props: RouteComponentProps) => {
         </Form.Item>
         <Form.Item name="index_img" label="印品缩略图">
           <Upload
+            accept="image/*"
             name="avatar"
             listType="picture-card"
             className="avatar-uploader"
@@ -230,8 +282,12 @@ const EditPrint = (props: RouteComponentProps) => {
             beforeUpload={() => false}
             onChange={handleChangeIndex}
           >
-            {index_img ? (
-              <img src={index_img} alt="avatar" style={{ width: "100%" }} />
+            {index_img || formData.index_img ? (
+              <img
+                src={index_img || formData.index_img}
+                alt="avatar"
+                style={{ width: "100%" }}
+              />
             ) : (
               uploadButton
             )}
@@ -241,16 +297,13 @@ const EditPrint = (props: RouteComponentProps) => {
           <Card>
             <div className={style.imageList}>
               <Upload
-                // action={"/api/uploadImage"}
+                accept="image/*"
                 name="avatar"
-                // showUploadList={false}
                 beforeUpload={() => false}
                 listType="picture-card"
                 className="avatar-uploader"
                 fileList={fileList}
                 onChange={handleChange}
-                onRemove={remove}
-                // customRequest={(e) => uploadFunc(e)}
               >
                 {uploadButton}
               </Upload>
@@ -285,7 +338,18 @@ const EditPrint = (props: RouteComponentProps) => {
           </Select>
         </Form.Item>
         <Form.Item name="specList" label="价格设置">
-          <Button>删除</Button>
+          <Button
+            onClick={() => {
+              if (delDataIds.length) {
+                const data = dataList.filter(
+                  (item) => !delDataIds.includes(item.id as never)
+                );
+                setDataList(data);
+              }
+            }}
+          >
+            删除
+          </Button>
           <Button onClick={() => setVisible(true)}>添加新规格</Button>
           <Table
             rowKey="id"

@@ -121,6 +121,7 @@ export default function EditBanner() {
         }
       >
         <Upload
+          accept="image/*"
           name="avatar"
           listType="picture-card"
           className="avatar-uploader"

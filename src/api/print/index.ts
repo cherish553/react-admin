@@ -8,7 +8,14 @@ export const getGoodsClassList = ({ page }: { page: number }): Promise<CommonPag
 export const getGoodList = ({ page }: { page: number }): Promise<CommonPagination<GoodListData>> => get('admin/goodsList', { page })
 
 // 新增、编辑印品
-export const postEditGoods = (data: EditPrintParam) => post(`admin/editGoods`, data)
+export const postEditGoods = ({ specList, imgList, ...rest }: EditPrintParam) => post(`admin/editGoods`, {
+    specList: JSON.stringify(specList),
+    imgList: JSON.stringify(imgList),
+    ...rest
+})
+
+// 删除印品 
+export const delGoods = (id: string[]) => del(`admin/delGoods`, { id: id.join(',') })
 
 // 编辑印品分类
 export const postEditGoodClass = (data: EditGoodClass): Promise<[]> => post('admin/editGoodsClass', data)
@@ -53,3 +60,9 @@ export const getGoodsInfo = (data: { id?: number | string }): Promise<GoodsInfoD
     }
     return res
 })
+// 印品热门设置
+export const postSetRecommend = (id: number[]) => post(`admin/setRecommend`, { id: id.join(',') })
+
+// 印品取消热门设置
+export const postDelRecommend = (id: number[]) => post(`admin/delRecommend`, { id: id.join(',') })
+// setRecommend

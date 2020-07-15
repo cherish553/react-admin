@@ -47,12 +47,26 @@ export interface EditPrintParam {
    model_id: string
    desc: string
    service_introduction: string
-   imgList: string
-   specList: string
+   imgList: EditImgList[]
+   specList: EditSpecList[]
+}
+export interface EditImgList {
+   id: string
+   img_url: string
+}
+export interface EditSpecList {
+   id: number | string
+   size: number | string
+   style: number | string
+   paper: number | string
+   binding: number | string
+   printing: number | string
+   price: number | string
+   number: number | string
 }
 export interface GoodsInfoData {
    classList: ClassList
-   goodsInfo: Pick<EditPrintParam, 'class_id' | 'id' | 'index_img' | 'model_id' | 'name'> & { is_recommend: number, img_list: ImgList, spec_list: Array<SpecList>, desc: string, service_introduction: string }
+   goodsInfo: Pick<EditPrintParam, 'class_id' | 'id' | 'index_img' | 'model_id' | 'name'> & { is_recommend: number, img_list: ImgList[], spec_list: Array<SpecList>, desc: string, service_introduction: string }
    modelList: ModelList
    specList: SpecListS
 }

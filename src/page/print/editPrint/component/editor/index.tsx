@@ -10,8 +10,19 @@ interface Props {
   setOutputHTML: (desc: string) => void;
 }
 export default class BasicDemo extends React.Component<Props> {
+  componentWillReceiveProps(e: any) {
+    console.log(e);
+    if (!this.state.flag) return;
+    if (e.outputHTML) {
+      this.setState({ flag: false });
+      this.setState({
+        editorState: BraftEditor.createEditorState(e.outputHTML),
+      });
+    }
+  }
   state = {
-    editorState: BraftEditor.createEditorState(""), // 设置编辑器初始内容
+    flag: true,
+    editorState: BraftEditor.createEditorState(this.props.outputHTML || ""), // 设置编辑器初始内容
   };
   uploadHandler = async (param: any) => {
     if (!param.file) {

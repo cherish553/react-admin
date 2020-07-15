@@ -1,16 +1,26 @@
 import React, { useState } from "react";
 import style from "./index.module.scss";
-import { useTableHook } from "@/hooks";
+import { useTableHook, useDelData } from "@/hooks";
 import { useHistory } from "react-router-dom";
-import { getGoodList } from "@api/print";
+import {
+  getGoodList,
+  delGoods,
+  postSetRecommend as PostSetRecommend,
+  postDelRecommend as PostDelRecommend,
+} from "@api/print";
 import { GoodListData } from "@api/print/api";
-import { Card, Button, Table } from "antd";
+import { Button, Table, message } from "antd";
 interface Obj {
   pathname: string;
   search?: string;
 }
 export default function Category() {
-  const [dataList, pagination] = useTableHook<GoodListData>(getGoodList);
+  const [dataList, pagination, , getDataList] = useTableHook<GoodListData>(
+    getGoodList
+  );
+  const [showDeleteConfirm, delDataIds, rowSelection] = useDelData<
+    GoodListData
+  >(delGoods, getDataList, "id");
   const router = useHistory();
   const jumpToPage = (url: string, id?: number) => {
     console.log(id);
@@ -22,19 +32,6 @@ export default function Category() {
     }
     router.push(obj);
   };
-  const [rowSelection] = useState({
-    onChange: (selectedRowKeys: any, selectedRows: any) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-    },
-    getCheckboxProps: (record: any) => ({
-      disabled: record.name === "Disabled User", // Column configuration not to be checked
-      name: record.name,
-    }),
-  });
   const [goodColumn] = useState([
     {
       title: "印品",
@@ -53,7 +50,7 @@ export default function Category() {
     },
     {
       title: "模板",
-      dataIndex: "a",
+      dataIndex: "model_id",
     },
     {
       title: "添加时间",
@@ -61,47 +58,65 @@ export default function Category() {
     },
     {
       title: "是否为添加印品",
-      dataIndex: "c",
+      dataIndex: "is_recommend",
+      render: (e) => <div>{!e ? "否" : "是"}</div>,
     },
     {
       title: "操作",
       dataIndex: "",
       render: (_: any, row: GoodListData) => (
         <>
-          <Button size={"small"} onClick={() => jumpToPage("/editPrint", row.id)}>
+          <Button
+            size={"small"}
+            onClick={() => jumpToPage("/editPrint", row.id)}
+          >
             编辑
           </Button>
-          <Button size={"small"} onClick={() => changes(row)}>
+          <Button size={"small"} onClick={() => showDeleteConfirm([row.id])}>
             删除
           </Button>
-          <Button size={"small"} onClick={() => changes(row)}>
+          <Button size={"small"} onClick={() => postSetRecommend([row.id])}>
             设置推荐
+          </Button>
+          <Button size={"small"} onClick={() => postDelRecommend([row.id])}>
+            取消推荐
           </Button>
         </>
       ),
     },
   ]);
-  const changes = (e: any): void => {
-    console.log(e);
+  const postSetRecommend = async (id: number[] | []) => {
+    if (!id.length) return message.error("至少选择一条数据");
+    await PostSetRecommend(id);
+    getDataList();
+  };
+  const postDelRecommend = async (id: number[] | []) => {
+    if (!id.length) return message.error("至少选择一条数据");
+    await PostDelRecommend(id);
+    getDataList();
   };
   return (
     <div>
-      <Card>
-        <div className={style.search}>
-          <Button
-            onClick={() => jumpToPage("/editPrint")}
-            className={style.mr20}
-            type={"primary"}
-          >
-            新增印品
-          </Button>
-          <Button type={"primary"}>新增类目</Button>
-        </div>
-      </Card>
-      <Button className={style.mr20} type={"primary"}>
+      <Button
+        onClick={() => jumpToPage("/editPrint")}
+        className={style.mr20}
+        type={"primary"}
+      >
+        新增印品
+      </Button>
+      <Button
+        className={style.mr20}
+        type={"primary"}
+        onClick={() => showDeleteConfirm(delDataIds)}
+      >
         删除
       </Button>
-      <Button type={"primary"}>批量设置推荐</Button>
+      <Button type={"primary"} onClick={() => postSetRecommend(delDataIds)}>
+        批量设置推荐
+      </Button>
+      <Button type={"primary"} onClick={() => postDelRecommend(delDataIds)}>
+        批量取消推荐
+      </Button>
       <div>
         <Table
           rowKey="id"
