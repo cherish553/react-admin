@@ -14,7 +14,7 @@ export interface StatisticsData {
    total_commission: string
    total_order_amount: number
    total_orders: number
-   total_users: number
+   total_users: number,
    total_wait_orders: number
    wait_orders: number
 }
