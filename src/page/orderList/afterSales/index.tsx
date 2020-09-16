@@ -13,13 +13,13 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 export default function AfterSales() {
   let router = useHistory();
-  const [dataList, pagination, , getDataList] = useTableHook<any>(
+  const [dataList, pagination] = useTableHook<any>(
     getAfterSaleList
   );
-  const [serachForm, setSerachForm] = useState({
-    userName: "cherish",
-    phone: "15628771443",
-  });
+  // const [serachForm, setSerachForm] = useState({
+  //   userName: "cherish",
+  //   phone: "15628771443",
+  // });
   const [rowSelection] = useState({
     onChange: (selectedRowKeys: any, selectedRows: any) => {
       console.log(

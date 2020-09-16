@@ -1,7 +1,7 @@
 import axios from 'axios'
 import cookie from 'js-cookie'
 const http = axios.create({
-  baseURL: `/api`,
+  baseURL: process.env.NODE_ENV==='development'?`/api`:process.env.REACT_APP_BASE_URL,
 })
 
 http.interceptors.request.use(
